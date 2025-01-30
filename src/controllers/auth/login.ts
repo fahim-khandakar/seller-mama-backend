@@ -11,7 +11,7 @@ export const login = async (
 ): Promise<void> => {
   try {
     const { email, password } = req.body;
-    const findUser = await UserModel.find({
+    const findUser = await UserModel.findOne({
       where: { email: email },
     });
     if (!findUser) {
