@@ -1,9 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
-import { UserModel } from "../../models/userModels";
-
-import { AppError } from "../../shared/helpers/AppError";
-
 import { Types } from "mongoose";
+import { AppError } from "../../shared/helpers/AppError";
+import { UserModel } from "../../models/userModels";
 
 export const getSingleUser = async (
   req: Request,
@@ -25,9 +23,7 @@ export const getSingleUser = async (
 
     res.status(200).json({
       status: "success",
-      data: {
-        user,
-      },
+      data: user,
     });
   } catch (error) {
     return next(new AppError("Internal Server Error", 500));
