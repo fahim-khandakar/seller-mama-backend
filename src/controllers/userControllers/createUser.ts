@@ -30,8 +30,11 @@ export const createUser = async (
     }
 
     const hashedPassword = hashSync(password, 10);
-    const newUser = new UserModel({ name, email, password: hashedPassword });
-    await newUser.save();
+    const newUser = await UserModel.create({
+      name,
+      email,
+      password: hashedPassword,
+    });
 
     res.status(201).json({
       status: "success",
