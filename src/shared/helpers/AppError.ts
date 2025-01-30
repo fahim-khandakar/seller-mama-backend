@@ -1,14 +1,16 @@
-// Custom Error class to standardize error messages
-class AppError extends Error {
+export class AppError extends Error {
   statusCode: number;
+  status: string;
   isOperational: boolean;
+  errors?: any[];
 
-  constructor(message: string, statusCode: number) {
+  constructor(message: string, statusCode: number, errors?: any[]) {
     super(message);
     this.statusCode = statusCode;
-    this.isOperational = true; // If it's an expected operational error
+    this.status = `${statusCode}`.startsWith("4") ? "fail" : "error";
+    this.isOperational = true;
+    this.errors = errors;
+
     Error.captureStackTrace(this, this.constructor);
   }
 }
-
-export { AppError };
