@@ -1,17 +1,12 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 
-// Creating a custom interface for your schema model
-interface IUser extends Document {
-  name: string;
-  email: string;
-}
-
-const userSchema = new Schema<IUser>(
+const userSchema = new Schema(
   {
     _id: { type: String, default: uuidv4, unique: true },
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
   },
   {
     timestamps: true,
@@ -19,4 +14,4 @@ const userSchema = new Schema<IUser>(
   }
 );
 
-export const UserModel = mongoose.model<IUser>("users", userSchema);
+export const UserModel = mongoose.model("users", userSchema);
