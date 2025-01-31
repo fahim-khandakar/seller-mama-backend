@@ -3,6 +3,10 @@ import { compareSync } from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import { UserModel } from "../../models/userModels";
 import { JWT_SECRET } from "../../shared/config/secrets";
+import { AppError } from "../../shared/helpers/AppError";
+import { loginSchema } from "../../schema/loginSchema";
+import { ZodError } from "zod";
+import { handleZodError } from "../../shared/helpers/errorHandler";
 
 export const login = async (
   req: Request,
@@ -10,18 +14,24 @@ export const login = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    loginSchema.parse(req.body);
+  } catch (error: any) {
+    if (error instanceof ZodError) {
+      return next(handleZodError(error));
+    }
+    return next(new AppError("An unknown validation error occurred.", 400));
+  }
+
+  try {
     const { email, password } = req.body;
-    const findUser = await UserModel.findOne({
-      where: { email: email },
-    });
+
+    const findUser = await UserModel.findOne({ email });
     if (!findUser) {
-      next();
-      return;
+      return next(new AppError("User not found", 404));
     }
 
     if (!compareSync(password, findUser.password)) {
-      next();
-      return;
+      return next(new AppError("Invalid password", 401));
     }
 
     const token = jwt.sign(
@@ -36,9 +46,8 @@ export const login = async (
       message: "User logged in successfully",
     });
   } catch (error) {
-    res.json({
-      status: 500,
-      message: "Internal Server Error",
-    });
+    // Handle unexpected errors
+    console.error(error);
+    return next(new AppError("Internal Server Error", 500));
   }
 };
