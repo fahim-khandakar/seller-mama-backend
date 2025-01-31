@@ -36,10 +36,13 @@ export const createUser = async (
       password: hashedPassword,
     });
 
+    // Destructure password from the object to exclude it
+    const { password: _, ...userResponse } = newUser.toObject();
+
     res.status(201).json({
       status: "success",
       data: {
-        user: newUser,
+        user: userResponse,
       },
       message: "User created successfully",
     });
