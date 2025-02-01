@@ -5,6 +5,6 @@ import { me } from "../controllers/auth/checkUser";
 
 const authRoutes: Router = Router();
 
-authRoutes.post("/login", login).get("/me", [authMiddleware], me);
+authRoutes.post("/signin", login).get("/me", [authMiddleware], me);
 
 export default authRoutes;

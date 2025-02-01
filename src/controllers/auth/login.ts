@@ -41,9 +41,10 @@ export const login = async (
     );
 
     res.json({
-      status: 200,
+      success: true,
       data: { token },
       message: "User logged in successfully",
+      status: 200,
     });
   } catch (error) {
     // Handle unexpected errors

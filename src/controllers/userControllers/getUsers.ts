@@ -5,7 +5,12 @@ import { UserModel } from "../../models/userModels";
 export const getUsers = async (req: Request, res: Response) => {
   try {
     const users = await UserModel.find().select("-password");
-    res.status(200).json(users);
+    res.json({
+      success: true,
+      data: users,
+      message: "Users fetched successfully",
+      status: 200,
+    });
   } catch (error) {
     res.status(500).json({ message: "Error fetching users", error });
   }

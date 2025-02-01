@@ -21,9 +21,10 @@ export const deleteUser = async (
       return next(new AppError("User not found", 404));
     }
 
-    res.status(200).json({
-      status: "success",
+    res.json({
+      success: true,
       message: "User deleted successfully",
+      status: 200,
     });
   } catch (error) {
     return next(new AppError("Internal Server Error", 500));

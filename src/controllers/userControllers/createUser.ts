@@ -39,12 +39,13 @@ export const createUser = async (
     // Destructure password from the object to exclude it
     const { password: _, ...userResponse } = newUser.toObject();
 
-    res.status(201).json({
-      status: "success",
+    res.json({
+      success: true,
       data: {
         user: userResponse,
       },
       message: "User created successfully",
+      status: 201,
     });
   } catch (error) {
     return next(new AppError("Internal Server Error", 500));
