@@ -5,6 +5,7 @@ import { deleteUser } from "../controllers/userControllers/deleteUser";
 import { getSingleUser } from "../controllers/userControllers/getSingleUser";
 import authMiddleware from "../middlewares/auth";
 import adminMiddleware from "../middlewares/adminMiddleware";
+import { me } from "../controllers/auth/checkUser";
 
 const userRoutes = Router();
 

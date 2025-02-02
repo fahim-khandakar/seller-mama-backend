@@ -12,7 +12,7 @@ interface IUser extends Document {
     postalCode: string;
     country: string;
   };
-  role: "user" | "admin";
+  role: "USER" | "ADMIN";
   wishlist: mongoose.Types.ObjectId[];
   cart: {
     product: mongoose.Types.ObjectId;
@@ -37,7 +37,7 @@ const userSchema = new Schema<IUser>(
       postalCode: { type: String },
       country: { type: String },
     },
-    role: { type: String, enum: ["user", "admin"], default: "user" },
+    role: { type: String, enum: ["USER", "ADMIN"], default: "USER" },
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "products" }],
     cart: [
       {

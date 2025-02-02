@@ -17,7 +17,7 @@ const authMiddleware = async (
 
   try {
     const payload = jwt.verify(token, JWT_SECRET) as any;
-    const user = await UserModel.findById(payload?.userId);
+    const user = await UserModel.findById(payload?.userId).select("-password");
 
     if (!user) {
       return next(new AppError("User not found", 404));
