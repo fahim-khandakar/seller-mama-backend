@@ -6,7 +6,7 @@ import { AppError } from "../../shared/helpers/AppError";
 import { ZodError } from "zod";
 import { handleZodError } from "../../shared/helpers/errorHandler";
 
-export const createUser = async (
+export const createUserByAdmin = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -20,7 +20,12 @@ export const createUser = async (
     return next(new AppError("An unknown validation error occurred.", 400));
   }
 
-  const { email, name, password, phone } = req.body;
+  const { email, name, password, phone, role } = req.body;
+
+  // Ensure role is either "ADMIN" or "USER"
+  if (!["ADMIN", "USER"].includes(role)) {
+    return next(new AppError("Invalid role. Must be 'ADMIN' or 'USER'.", 400));
+  }
 
   try {
     const findUser = await UserModel.findOne({ email });
@@ -35,9 +40,10 @@ export const createUser = async (
       email,
       phone,
       password: hashedPassword,
+      role: role.toUpperCase(), // Ensure role is stored in uppercase
     });
 
-    // Destructure password from the object to exclude it
+    // Remove password from response
     const { password: _, ...userResponse } = newUser.toObject();
 
     res.json({
