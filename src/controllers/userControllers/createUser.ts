@@ -10,6 +10,8 @@ import {
   sendVerificationEmail,
   storeVerificationCode,
 } from "./utilities/email.utility";
+import * as jwt from "jsonwebtoken";
+import { JWT_SECRET } from "../../shared/config/secrets";
 
 export const createUser = async (
   req: Request,
@@ -47,13 +49,24 @@ export const createUser = async (
       password: hashedPassword,
     });
 
+    const token = jwt.sign(
+      {
+        userId: newUser.id,
+        email: newUser.email,
+        role: newUser.role,
+        name: newUser.name,
+      },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
     // Destructure password from the object to exclude it
     const { password: _, ...userResponse } = newUser.toObject();
 
     res.json({
       success: true,
       data: {
-        user: userResponse,
+        token,
       },
       message: "User created successfully",
       status: 201,

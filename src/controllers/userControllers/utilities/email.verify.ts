@@ -6,7 +6,7 @@ import { updateVerificationStatus } from "../updateVerification";
 
 export const verifyEmail = catchAsync(async (req: Request, res: Response) => {
   const { email, code } = req.body;
-
+  console.log("email", email, "code", code);
   if (!email || !code) {
     return sendResponse(res, {
       statusCode: 400,
