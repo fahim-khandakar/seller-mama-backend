@@ -5,6 +5,11 @@ import { userSchema } from "../../schema/userSchema";
 import { AppError } from "../../shared/helpers/AppError";
 import { ZodError } from "zod";
 import { handleZodError } from "../../shared/helpers/errorHandler";
+import {
+  generateVerificationCode,
+  sendVerificationEmail,
+  storeVerificationCode,
+} from "./utilities/email.utility";
 
 export const createUser = async (
   req: Request,
@@ -21,6 +26,11 @@ export const createUser = async (
   }
 
   const { email, name, password, phone } = req.body;
+
+  const verificationCode = generateVerificationCode();
+  storeVerificationCode(email, verificationCode);
+  // Send verification email
+  await sendVerificationEmail(email, verificationCode);
 
   try {
     const findUser = await UserModel.findOne({ email });
