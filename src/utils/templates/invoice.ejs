@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Invoice</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0 auto;
+        padding: 20px;
+        max-width: 700px;
+        background-color: #f8f9fa;
+        color: #333;
+      }
+
+      h1 {
+        color: #2c3e50;
+        font-size: 28px;
+        margin-bottom: 20px;
+      }
+
+      .section {
+        margin-bottom: 20px;
+        padding: 15px;
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+      }
+
+      .label {
+        font-weight: bold;
+        color: #555;
+      }
+
+      .value {
+        margin-bottom: 10px;
+      }
+
+      a.download-link {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #2ecc71;
+        color: white;
+        border-radius: 5px;
+        text-decoration: none;
+      }
+
+      a.download-link:hover {
+        background-color: #27ae60;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Invoice for Booking</h1>
+
+    <div class="section">
+      <div class="value">
+        <span class="label">User Name:</span> <%= userName %>
+      </div>
+      <div class="value">
+        <span class="label">Tour Title:</span> <%= tourTitle %>
+      </div>
+      <div class="value">
+        <span class="label">Booking Date:</span>
+        <%= new Date(bookingDate).toLocaleDateString("en-US", { year: "numeric",
+        month: "long", day: "numeric", }) %>
+      </div>
+      <div class="value">
+        <span class="label">Guest Count:</span> <%= guestCount %>
+      </div>
+      <div class="value">
+        <span class="label">Amount Paid:</span> $<%= totalAmount.toFixed(2) %>
+      </div>
+      <div class="value">
+        <span class="label">Transaction ID:</span> <%= transactionId %>
+      </div>
+    </div>
+
+    <p>✅ Thank you for your booking!</p>
+
+    <a class="download-link" href="/invoice/download/<%= transactionId %>"
+      >Download Invoice PDF</a
+    >
+  </body>
+</html>
