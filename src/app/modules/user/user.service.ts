@@ -19,7 +19,7 @@ const createUser = async (payload: Partial<IUser>) => {
 
   const hashedPassword = await bcrypt.hash(
     password as string,
-    Number(envVars.BCRYPT_SALT_ROUND)
+    Number(envVars.BCRYPT_SALT_ROUND),
   );
 
   const authProvider: IAuthProvider = {
@@ -40,9 +40,12 @@ const createUser = async (payload: Partial<IUser>) => {
 const updateUser = async (
   userId: string,
   payload: Partial<IUser>,
-  decodedToken: JwtPayload
+  decodedToken: JwtPayload,
 ) => {
-  if (decodedToken.role === Role.CUSTOMER || decodedToken.role === Role.CUSTOMER) {
+  if (
+    decodedToken.role === Role.CUSTOMER ||
+    decodedToken.role === Role.CUSTOMER
+  ) {
     if (userId !== decodedToken.userId) {
       throw new AppError(401, "You are not authorized");
     }
@@ -71,7 +74,10 @@ const updateUser = async (
    */
 
   if (payload.role) {
-    if (decodedToken.role === Role.CUSTOMER || decodedToken.role === Role.CUSTOMER) {
+    if (
+      decodedToken.role === Role.CUSTOMER ||
+      decodedToken.role === Role.CUSTOMER
+    ) {
       throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
     }
 
@@ -81,7 +87,10 @@ const updateUser = async (
   }
 
   if (payload.isActive || payload.isDeleted || payload.isVerified) {
-    if (decodedToken.role === Role.CUSTOMER || decodedToken.role === Role.CUSTOMER) {
+    if (
+      decodedToken.role === Role.CUSTOMER ||
+      decodedToken.role === Role.CUSTOMER
+    ) {
       throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
     }
   }
@@ -95,7 +104,13 @@ const updateUser = async (
 };
 
 const getAllUsers = async (query: Record<string, string>) => {
-  const queryBuilder = new QueryBuilder(User.find(), query);
+  const customQuery = {
+    ...query,
+    role: query.role || { $in: [Role.SUPER_ADMIN, Role.MODERATOR, Role.ADMIN] },
+  };
+
+  const queryBuilder = new QueryBuilder(User.find(), customQuery as any);
+
   const usersData = queryBuilder
     .filter()
     .search(userSearchableFields)
@@ -108,10 +123,7 @@ const getAllUsers = async (query: Record<string, string>) => {
     queryBuilder.getMeta(),
   ]);
 
-  return {
-    data,
-    meta,
-  };
+  return { data, meta };
 };
 const getSingleUser = async (id: string) => {
   const user = await User.findById(id).select("-password");
