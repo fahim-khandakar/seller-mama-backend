@@ -17,7 +17,7 @@ const createUser = catchAsync(
       message: "User Created Successfully",
       data: user,
     });
-  }
+  },
 );
 const updateUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -29,7 +29,7 @@ const updateUser = catchAsync(
     const user = await UserServices.updateUser(
       userId as string,
       payload,
-      verifiedToken as JwtPayload
+      verifiedToken as JwtPayload,
     );
 
     sendResponse(res, {
@@ -38,14 +38,14 @@ const updateUser = catchAsync(
       message: "User Updated Successfully",
       data: user,
     });
-  }
+  },
 );
 
 const getAllUsers = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const query = req.query;
     const result = await UserServices.getAllUsers(
-      query as Record<string, string>
+      query as Record<string, string>,
     );
 
     sendResponse(res, {
@@ -55,7 +55,23 @@ const getAllUsers = catchAsync(
       data: result.data,
       meta: result.meta,
     });
-  }
+  },
+);
+const getAllCustomers = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const query = req.query;
+    const result = await UserServices.getAllCustomers(
+      query as Record<string, string>,
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: "All Customers Retrieved Successfully",
+      data: result.data,
+      meta: result.meta,
+    });
+  },
 );
 const getMe = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -68,7 +84,7 @@ const getMe = catchAsync(
       message: "Your profile Retrieved Successfully",
       data: result.data,
     });
-  }
+  },
 );
 const getSingleUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -80,7 +96,7 @@ const getSingleUser = catchAsync(
       message: "User Retrieved Successfully",
       data: result.data,
     });
-  }
+  },
 );
 
 export const UserControllers = {
@@ -89,4 +105,5 @@ export const UserControllers = {
   getSingleUser,
   updateUser,
   getMe,
+  getAllCustomers,
 };

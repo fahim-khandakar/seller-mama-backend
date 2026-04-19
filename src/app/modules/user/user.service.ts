@@ -117,7 +117,7 @@ const getAllUsers = async (query: Record<string, string>) => {
     .sort()
     .fields()
     .paginate();
-
+  console.log(queryBuilder);
   const [data, meta] = await Promise.all([
     usersData.build(),
     queryBuilder.getMeta(),
@@ -125,6 +125,30 @@ const getAllUsers = async (query: Record<string, string>) => {
 
   return { data, meta };
 };
+
+const getAllCustomers = async (query: Record<string, string>) => {
+  const customQuery = {
+    ...query,
+    role: query.role || { $in: [Role.CUSTOMER] },
+  };
+
+  const queryBuilder = new QueryBuilder(User.find(), customQuery as any);
+
+  const usersData = queryBuilder
+    .filter()
+    .search(userSearchableFields)
+    .sort()
+    .fields()
+    .paginate();
+  console.log(queryBuilder);
+  const [data, meta] = await Promise.all([
+    usersData.build(),
+    queryBuilder.getMeta(),
+  ]);
+
+  return { data, meta };
+};
+
 const getSingleUser = async (id: string) => {
   const user = await User.findById(id).select("-password");
   return {
@@ -144,4 +168,5 @@ export const UserServices = {
   getSingleUser,
   updateUser,
   getMe,
+  getAllCustomers,
 };
