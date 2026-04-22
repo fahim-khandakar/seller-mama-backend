@@ -8,12 +8,26 @@ import catchAsync from "../../../utils/catchAsync";
 import { sendResponse } from "../../../utils/sendResponse";
 
 const createProduct = catchAsync(async (req: Request, res: Response) => {
+  // Validate that images are provided
+  if (!req.files || (Array.isArray(req.files) && req.files.length === 0)) {
+    return sendResponse(res, {
+      statusCode: httpStatus.BAD_REQUEST,
+      success: false,
+      message: "At least one product image is required",
+      data: null,
+    });
+  }
+
   const validatedData = ProductValidations.createProductValidation.parse(
     req.body,
   );
   const userId = (req.user as JwtPayload).userId as string;
 
-  const result = await ProductServices.createProduct(validatedData, userId);
+  const result = await ProductServices.createProduct(
+    validatedData,
+    userId,
+    req.files as Express.Multer.File[],
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -60,6 +74,7 @@ const updateProduct = catchAsync(async (req: Request, res: Response) => {
     productId as string,
     validatedData,
     userId,
+    req.files as Express.Multer.File[] | undefined,
   );
 
   sendResponse(res, {

@@ -3,19 +3,51 @@ import { IProduct } from "./product.interface";
 import { Product } from "./product.model";
 import { QueryBuilder } from "../../../utils/QueryBuilder";
 import { productSearchableFields } from "./product.constant";
+import {
+  uploadBufferToCloudinary,
+  deleteImageFromCLoudinary,
+} from "../../../config/cloudinary.config";
+import AppError from "../../../error helpers/AppError";
 
 type CreateProductPayload = Omit<
   IProduct,
   "totalStock" | "createdBy" | "isActive" | "createdAt" | "updatedAt"
 >;
 
-const createProduct = async (payload: CreateProductPayload, userId: string) => {
-  const product = await Product.create({
-    ...payload,
-    createdBy: new Types.ObjectId(userId),
-  });
+const createProduct = async (
+  payload: CreateProductPayload,
+  userId: string,
+  files: Express.Multer.File[],
+) => {
+  // Files are already uploaded to Cloudinary by multer
+  // Just collect the URLs
+  const imageUrls: string[] = files
+    .map((file) => file.path)
+    .filter((url) => url && typeof url === "string");
 
-  return product;
+  if (imageUrls.length === 0) {
+    throw new AppError(400, "Failed to upload images to Cloudinary");
+  }
+
+  try {
+    const product = await Product.create({
+      ...payload,
+      images: imageUrls,
+      createdBy: new Types.ObjectId(userId),
+    });
+
+    return product;
+  } catch (error) {
+    // Rollback: Delete uploaded images if product creation fails
+    for (const url of imageUrls) {
+      try {
+        await deleteImageFromCLoudinary(url);
+      } catch (deleteError) {
+        console.error("Error deleting image during rollback:", deleteError);
+      }
+    }
+    throw error;
+  }
 };
 
 const getAllProducts = async (query: Record<string, string>) => {
@@ -51,34 +83,94 @@ const updateProduct = async (
   productId: string,
   payload: Partial<IProduct>,
   userId: string,
+  files?: Express.Multer.File[],
 ) => {
   const product = await Product.findById(productId);
   if (!product) {
-    throw new Error("Product not found");
+    throw new AppError(404, "Product not found");
   }
 
   // Check authorization
   if (product.createdBy.toString() !== userId) {
-    // TODO: Add role check
-    throw new Error("Unauthorized to update product");
+    throw new AppError(401, "Unauthorized to update product");
   }
 
-  const updatedProduct = await Product.findByIdAndUpdate(productId, payload, {
-    new: true,
-    runValidators: true,
-  }).populate("createdBy", "name email");
+  let imageUrls = product.images || [];
+  const oldImageUrls = [...imageUrls];
 
-  return updatedProduct;
+  try {
+    // If new files are provided, replace old images
+    if (files && files.length > 0) {
+      imageUrls = files
+        .map((file) => file.path)
+        .filter((url) => url && typeof url === "string");
+
+      if (imageUrls.length === 0) {
+        throw new AppError(400, "Failed to upload new images to Cloudinary");
+      }
+    }
+
+    const updatePayload = { ...payload };
+    if (files && files.length > 0) {
+      updatePayload.images = imageUrls;
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      productId,
+      updatePayload,
+      {
+        new: true,
+        runValidators: true,
+      },
+    ).populate("createdBy", "name email");
+
+    // Delete old images only if new images were uploaded successfully
+    if (files && files.length > 0) {
+      for (const oldUrl of oldImageUrls) {
+        try {
+          await deleteImageFromCLoudinary(oldUrl);
+        } catch (deleteError) {
+          console.error("Error deleting old image:", deleteError);
+        }
+      }
+    }
+
+    return updatedProduct;
+  } catch (error) {
+    // Rollback: Delete newly uploaded images if update fails
+    if (files && files.length > 0) {
+      for (const url of imageUrls) {
+        try {
+          await deleteImageFromCLoudinary(url);
+        } catch (deleteError) {
+          console.error("Error deleting image during rollback:", deleteError);
+        }
+      }
+    }
+    throw error;
+  }
 };
 
 const deleteProduct = async (productId: string, userId: string) => {
   const product = await Product.findById(productId);
   if (!product) {
-    throw new Error("Product not found");
+    throw new AppError(404, "Product not found");
   }
 
   if (product.createdBy.toString() !== userId) {
-    throw new Error("Unauthorized to delete product");
+    throw new AppError(401, "Unauthorized to delete product");
+  }
+
+  // Delete images from Cloudinary
+  if (product.images && product.images.length > 0) {
+    for (const imageUrl of product.images) {
+      try {
+        await deleteImageFromCLoudinary(imageUrl);
+      } catch (error) {
+        console.error("Error deleting image from Cloudinary:", error);
+        // Continue deleting other images even if one fails
+      }
+    }
   }
 
   await Product.findByIdAndDelete(productId);

@@ -6,29 +6,19 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinaryUpload,
   params: {
     public_id: (req, file) => {
-      // My Special.Image#!@.png => 4545adsfsadf-45324263452-my-image.png
-      // My Special.Image#!@.png => [My Special, Image#!@, png]
-
-      const fileName = file.originalname
+      // Clean filename: remove extension, clean special chars, add timestamp
+      const nameWithoutExt = file.originalname
         .toLowerCase()
-        .replace(/\s+/g, "-") // empty space remove replace with dash
-        .replace(/\./g, "-")
-        // eslint-disable-next-line no-useless-escape
-        .replace(/[^a-z0-9\-\.]/g, ""); // non alpha numeric - !@#$
+        .replace(/\.[^/.]+$/, "") // Remove extension
+        .replace(/\s+/g, "-") // Replace spaces with dash
+        .replace(/[^a-z0-9\-]/g, ""); // Remove special chars except dash
 
-      const extension = file.originalname.split(".").pop();
+      // Get clean extension
+      const extension =
+        file.originalname.split(".").pop()?.toLowerCase() || "jpg";
 
-      // binary -> 0,1 hexa decimal -> 0-9 A-F base 36 -> 0-9 a-z
-      // 0.2312345121 -> "0.hedfa674338sasfamx" ->
-      //452384772534
-      const uniqueFileName =
-        Math.random().toString(36).substring(2) +
-        "-" +
-        Date.now() +
-        "-" +
-        fileName +
-        "." +
-        extension;
+      // Create unique filename without double extension
+      const uniqueFileName = `${Math.random().toString(36).substring(2)}-${Date.now()}-${nameWithoutExt}`;
 
       return uniqueFileName;
     },

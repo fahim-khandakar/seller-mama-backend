@@ -13,7 +13,7 @@ cloudinary.config({
 
 export const uploadBufferToCloudinary = async (
   buffer: Buffer,
-  fileName: string
+  fileName: string,
 ): Promise<UploadApiResponse | undefined> => {
   try {
     return new Promise((resolve, reject) => {
@@ -34,7 +34,7 @@ export const uploadBufferToCloudinary = async (
               return reject(error);
             }
             resolve(result);
-          }
+          },
         )
         .end(buffer);
     });
@@ -46,20 +46,23 @@ export const uploadBufferToCloudinary = async (
 
 export const deleteImageFromCLoudinary = async (url: string) => {
   try {
-    //https://res.cloudinary.com/djzppynpk/image/upload/v1753126572/ay9roxiv8ue-1753126570086-download-2-jpg.jpg.jpg
+    // Extract public_id from Cloudinary URL
+    // URL format: https://res.cloudinary.com/{cloud_name}/image/upload/v{timestamp}/{public_id}.{extension}
 
-    const regex = /\/v\d+\/(.*?)\.(jpg|jpeg|png|gif|webp)$/i;
+    const urlParts = url.split("/");
+    const filePart = urlParts[urlParts.length - 1]; // Gets "public_id.extension"
+    const public_id = filePart.split(".")[0]; // Gets public_id without extension
 
-    const match = url.match(regex);
+    console.log({ url, public_id });
 
-    console.log({ match });
-
-    if (match && match[1]) {
-      const public_id = match[1];
+    if (public_id) {
       await cloudinary.uploader.destroy(public_id);
       console.log(`File ${public_id} is deleted from cloudinary`);
+    } else {
+      throw new Error("Could not extract public_id from URL");
     }
   } catch (error: any) {
+    console.error("Cloudinary deletion error:", error);
     throw new AppError(401, "Cloudinary image deletion failed", error.message);
   }
 };
