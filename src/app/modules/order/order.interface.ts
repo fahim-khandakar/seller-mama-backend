@@ -6,6 +6,7 @@ export interface IOrderItem {
   sellPrice: number;
   stockEntry: Types.ObjectId;
   purchasePrice: number; // for profit calculation
+  nameAndNumber?: string;
 }
 
 export interface IOrder {
@@ -16,7 +17,10 @@ export interface IOrder {
   finalAmount: number;
   customerName: string;
   customerPhone?: string;
+  customerEmail?: string;
   customerAddress?: string;
+  transactionId?: string;
+  paymentMethod?: "BKASH" | "ROCKET" | "NAGAD" | "CARD" | "CASH";
   status: "PENDING" | "CONFIRMED" | "SHIPPED" | "DELIVERED" | "CANCELLED";
   soldBy: Types.ObjectId;
   createdAt?: Date;

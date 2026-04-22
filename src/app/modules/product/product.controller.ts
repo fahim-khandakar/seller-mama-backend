@@ -23,25 +23,6 @@ const createProduct = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const addStock = catchAsync(async (req: Request, res: Response) => {
-  const { productId } = req.params;
-  const validatedData = ProductValidations.addStockValidation.parse(req.body);
-  const userId = (req.user as JwtPayload).userId as string;
-
-  const result = await ProductServices.addStock(
-    productId as string,
-    validatedData,
-    userId,
-  );
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Stock added successfully",
-    data: result,
-  });
-});
-
 const getAllProducts = catchAsync(async (req: Request, res: Response) => {
   const result = await ProductServices.getAllProducts(
     req.query as Record<string, string>,
@@ -67,38 +48,6 @@ const getSingleProduct = catchAsync(async (req: Request, res: Response) => {
     data: result.data,
   });
 });
-
-const getProductStockHistory = catchAsync(
-  async (req: Request, res: Response) => {
-    const { productId } = req.params;
-    const result = await ProductServices.getProductStockHistory(
-      productId as string,
-    );
-
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: "Product stock history retrieved successfully",
-      data: result,
-    });
-  },
-);
-
-const getProductStockSummary = catchAsync(
-  async (req: Request, res: Response) => {
-    const { productId } = req.params;
-    const result = await ProductServices.getProductStockSummary(
-      productId as string,
-    );
-
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: "Product stock summary retrieved successfully",
-      data: result,
-    });
-  },
-);
 
 const updateProduct = catchAsync(async (req: Request, res: Response) => {
   const { productId } = req.params;
@@ -140,11 +89,9 @@ const deleteProduct = catchAsync(async (req: Request, res: Response) => {
 
 export const ProductControllers = {
   createProduct,
-  addStock,
   getAllProducts,
   getSingleProduct,
-  getProductStockHistory,
-  getProductStockSummary,
+
   updateProduct,
   deleteProduct,
 };

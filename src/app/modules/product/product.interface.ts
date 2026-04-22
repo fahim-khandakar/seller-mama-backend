@@ -1,21 +1,13 @@
 import { Types } from "mongoose";
 
-export interface IStockEntry {
-  _id?: Types.ObjectId;
-  quantity: number;
-  purchasePrice: number;
-  purchaseDate: Date;
-  remainingQuantity: number; // for FIFO tracking
-}
-
 export interface IProduct {
   _id?: Types.ObjectId;
   name: string;
-  description?: string;
+  description?: string[];
+  images?: string[];
   category: string;
   basePrice: number;
   discountPrice?: number;
-  stock: IStockEntry[];
   totalStock: number; // calculated field
   isActive: boolean;
   createdBy: Types.ObjectId; // user who created
@@ -43,16 +35,4 @@ export interface IOrder {
   soldBy: Types.ObjectId; // admin/moderator who sold
   createdAt?: Date;
   updatedAt?: Date;
-}
-
-export interface IAnalytics {
-  _id?: Types.ObjectId;
-  user: Types.ObjectId; // seller
-  product: Types.ObjectId;
-  order: Types.ObjectId;
-  quantity: number;
-  sellPrice: number;
-  purchasePrice: number; // from stock entry
-  profit: number;
-  date: Date;
 }

@@ -14,28 +14,9 @@ router.post(
   ProductControllers.createProduct,
 );
 
-router.post(
-  "/:productId/stock",
-  checkAuth(Role.ADMIN, Role.MODERATOR, Role.SUPER_ADMIN),
-  validateRequest(ProductValidations.addStockValidation),
-  ProductControllers.addStock,
-);
-
 router.get("/", ProductControllers.getAllProducts);
 
 router.get("/:productId", ProductControllers.getSingleProduct);
-
-router.get(
-  "/:productId/stock-history",
-  checkAuth(Role.ADMIN, Role.MODERATOR, Role.SUPER_ADMIN),
-  ProductControllers.getProductStockHistory,
-);
-
-router.get(
-  "/:productId/stock-summary",
-  checkAuth(Role.ADMIN, Role.MODERATOR, Role.SUPER_ADMIN),
-  ProductControllers.getProductStockSummary,
-);
 
 router.patch(
   "/:productId",

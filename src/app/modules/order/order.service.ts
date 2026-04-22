@@ -26,42 +26,22 @@ const createOrder = async (payload: CreateOrderPayload, userId: string) => {
     let totalAmount = 0;
     const processedItems: any[] = [];
 
-    // Process each item and decrement stock
     for (const item of payload.items || []) {
       const product = await Product.findById(item.product).session(session);
+
       if (!product) {
         throw new Error(`Product ${item.product} not found`);
       }
 
-      if (product.totalStock < item.quantity) {
-        throw new Error(`Insufficient stock for product ${product.name}`);
-      }
+      // No stock checking anymore
 
-      let remainingQuantity = item.quantity;
-      const stockEntries = product.stock.sort(
-        (a, b) => a.purchaseDate.getTime() - b.purchaseDate.getTime(),
-      ); // FIFO
+      totalAmount += item.quantity * item.sellPrice;
 
-      for (const entry of stockEntries) {
-        if (remainingQuantity <= 0) break;
-
-        const deduct = Math.min(remainingQuantity, entry.remainingQuantity);
-        entry.remainingQuantity -= deduct;
-        remainingQuantity -= deduct;
-
-        processedItems.push({
-          product: item.product,
-          quantity: deduct,
-          sellPrice: item.sellPrice,
-          stockEntry: entry._id,
-          purchasePrice: entry.purchasePrice,
-        });
-
-        totalAmount += deduct * item.sellPrice;
-      }
-
-      // Update product stock
-      await product.save({ session });
+      processedItems.push({
+        product: item.product,
+        quantity: item.quantity,
+        sellPrice: item.sellPrice,
+      });
     }
 
     const finalAmount = totalAmount - (payload.discountAmount || 0);
@@ -73,6 +53,7 @@ const createOrder = async (payload: CreateOrderPayload, userId: string) => {
           items: processedItems,
           totalAmount,
           finalAmount,
+          status: "Pending", // default দিলে safe
           soldBy: new Types.ObjectId(userId),
         },
       ],
