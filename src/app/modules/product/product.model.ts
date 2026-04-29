@@ -13,6 +13,7 @@ const productSchema = new Schema<IProduct>(
     totalStock: { type: Number, default: 0 },
     isActive: { type: Boolean, default: true },
     createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    type: { type: Schema.Types.ObjectId, ref: "Type", required: true },
   },
   {
     timestamps: true,

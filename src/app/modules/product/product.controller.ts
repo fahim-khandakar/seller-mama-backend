@@ -18,13 +18,10 @@ const createProduct = catchAsync(async (req: Request, res: Response) => {
     });
   }
 
-  const validatedData = ProductValidations.createProductValidation.parse(
-    req.body,
-  );
   const userId = (req.user as JwtPayload).userId as string;
 
   const result = await ProductServices.createProduct(
-    validatedData,
+    req.body,
     userId,
     req.files as Express.Multer.File[],
   );
@@ -65,14 +62,12 @@ const getSingleProduct = catchAsync(async (req: Request, res: Response) => {
 
 const updateProduct = catchAsync(async (req: Request, res: Response) => {
   const { productId } = req.params;
-  const validatedData = ProductValidations.updateProductValidation.parse(
-    req.body,
-  );
+
   const userId = (req.user as JwtPayload).userId as string;
 
   const result = await ProductServices.updateProduct(
     productId as string,
-    validatedData,
+    req.body,
     userId,
     req.files as Express.Multer.File[] | undefined,
   );
