@@ -4,12 +4,7 @@ import { IType } from "./type.interface";
 const typeSchema = new Schema<IType>(
   {
     name: { type: String, required: true },
-
-    category: {
-      type: Schema.Types.ObjectId,
-      ref: "Category",
-      required: [true, "Category ID is required"],
-    },
+    slug: { type: String, required: true, unique: true, lowercase: true },
   },
   {
     timestamps: true,

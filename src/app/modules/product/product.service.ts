@@ -8,6 +8,9 @@ import {
   deleteImageFromCLoudinary,
 } from "../../../config/cloudinary.config";
 import AppError from "../../../error helpers/AppError";
+import { MainCategory } from "../Main Category/mainCategory.model";
+import { Category } from "../Category/category.model";
+import { Type } from "../Type/type.model";
 
 type CreateProductPayload = Omit<
   IProduct,
@@ -28,6 +31,21 @@ const createProduct = async (
   if (imageUrls.length === 0) {
     throw new AppError(400, "Failed to upload images to Cloudinary");
   }
+  const mainCategory = await MainCategory.findById(payload.mainCategory);
+  if (!mainCategory) {
+    throw new AppError(400, "Invalid main category");
+  }
+  payload.mainCategorySlug = mainCategory.slug;
+  const category = await Category.findById(payload.category);
+  if (!category) {
+    throw new AppError(400, "Invalid category");
+  }
+  payload.categorySlug = category.slug;
+  const type = await Type.findById(payload.type);
+  if (!type) {
+    throw new AppError(400, "Invalid type");
+  }
+  payload.typeSlug = type.slug;
 
   try {
     const product = await Product.create({
@@ -51,59 +69,38 @@ const createProduct = async (
 };
 
 const getAllProducts = async (query: Record<string, string>) => {
-  const { minPrice, maxPrice, mainCategory, category, ...remainingQuery } =
-    query;
+  const { minPrice, maxPrice, ...remainingQuery } = query;
 
-  // 1. Price Range logic build kora
-  const priceFilter: any = {};
+  const filter: any = {};
+
   if (minPrice || maxPrice) {
-    priceFilter.basePrice = {};
-    if (minPrice) priceFilter.basePrice.$gte = Number(minPrice);
-    if (maxPrice) priceFilter.basePrice.$lte = Number(maxPrice);
+    filter.basePrice = {};
+    if (minPrice) filter.basePrice.$gte = Number(minPrice);
+    if (maxPrice) filter.basePrice.$lte = Number(maxPrice);
   }
 
-  // 2. Initial Query Build (With Price Filter)
-  let productQuery = Product.find(priceFilter)
-    .populate({
-      path: "type",
-      populate: {
-        path: "category",
-        populate: {
-          path: "mainCategory",
-        },
-      },
-    })
-    .populate("createdBy", "name email");
+  if (remainingQuery.category) {
+    remainingQuery.categorySlug = remainingQuery.category;
+    delete remainingQuery.category;
+  }
 
-  // 3. QueryBuilder initialize kora
-  const queryBuilder = new QueryBuilder(productQuery, remainingQuery);
+  if (remainingQuery.mainCategory) {
+    remainingQuery.mainCategorySlug = remainingQuery.mainCategory;
+    delete remainingQuery.mainCategory;
+  }
 
-  // 4. Execution
+  const queryBuilder = new QueryBuilder(
+    Product.find(filter).populate("mainCategory category type"),
+    remainingQuery,
+  );
+
   const productsData = queryBuilder
-    .filter() // Baaki field (like type ID) eikhan diye filter hobe
+    .filter()
     .search(productSearchableFields)
     .sort()
-    .fields()
     .paginate();
 
-  let data = await productsData.build();
-
-  // 5. MainCategory ebong Category diye Manual Filtering
-  // Karon e gulo deeply nested, QueryBuilder direct database level-e nested populate filter korte pare na
-  if (mainCategory || category) {
-    data = data.filter((product: any) => {
-      const matchCategory = category
-        ? product.type?.category?._id.toString() === category
-        : true;
-
-      const matchMainCategory = mainCategory
-        ? product.type?.category?.mainCategory?._id.toString() === mainCategory
-        : true;
-
-      return matchCategory && matchMainCategory;
-    });
-  }
-
+  const data = await productsData.build();
   const meta = await queryBuilder.getMeta();
 
   return { data, meta };

@@ -19,6 +19,8 @@ const createProductValidation = z.object({
   }, z.boolean().optional().default(true)),
 
   type: z.string({ error: "Type ID is required" }),
+  category: z.string({ error: "Category ID is required" }),
+  mainCategory: z.string({ error: "Main Category ID is required" }),
 });
 
 const updateProductValidation = z.object({
@@ -31,6 +33,8 @@ const updateProductValidation = z.object({
   totalStock: z.coerce.number().min(0).optional(),
   isActive: z.boolean().optional(),
   type: z.string().optional(),
+  category: z.string().optional(),
+  mainCategory: z.string().optional(),
 });
 
 export const ProductValidations = {

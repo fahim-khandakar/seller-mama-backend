@@ -3,7 +3,7 @@ import { Types } from "mongoose";
 export interface IType {
   _id?: Types.ObjectId;
   name: string;
-  category: Types.ObjectId;
+  slug: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

@@ -10,7 +10,7 @@ const createType = async (payload: IType) => {
 };
 
 const getAllTypes = async (query: Record<string, string>) => {
-  const typeQuery = new QueryBuilder(Type.find().populate("category"), query)
+  const typeQuery = new QueryBuilder(Type.find(), query)
     .search(typeSearchableFields)
     .filter()
     .sort()
@@ -29,7 +29,7 @@ const getAllTypes = async (query: Record<string, string>) => {
 };
 
 const getSingleType = async (id: string) => {
-  const result = await Type.findById(id).populate("category");
+  const result = await Type.findById(id);
   if (!result) {
     throw new AppError(404, "Type not found!");
   }
@@ -46,7 +46,7 @@ const updateType = async (id: string, payload: Partial<IType>) => {
   const result = await Type.findByIdAndUpdate(id, payload, {
     new: true,
     runValidators: true,
-  }).populate("category");
+  });
 
   return result;
 };

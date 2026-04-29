@@ -10,10 +10,7 @@ const createCategory = async (payload: ICategory) => {
 };
 
 const getAllCategories = async (query: Record<string, string>) => {
-  const categoryQuery = new QueryBuilder(
-    Category.find().populate("mainCategory"),
-    query,
-  )
+  const categoryQuery = new QueryBuilder(Category.find(), query)
     .search(categorySearchableFields)
     .filter()
     .sort()
@@ -32,7 +29,7 @@ const getAllCategories = async (query: Record<string, string>) => {
 };
 
 const getSingleCategory = async (id: string) => {
-  const result = await Category.findById(id).populate("mainCategory");
+  const result = await Category.findById(id);
 
   if (!result) {
     throw new AppError(404, "Category not found!");

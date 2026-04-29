@@ -8,10 +8,11 @@ const categorySchema = new Schema<ICategory>(
       required: true,
       trim: true,
     },
-    mainCategory: {
-      type: Schema.Types.ObjectId,
-      ref: "MainCategory",
-      required: [true, "Main Category ID is required"],
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
     },
   },
   {

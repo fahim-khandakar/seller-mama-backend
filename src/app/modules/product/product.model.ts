@@ -13,6 +13,15 @@ const productSchema = new Schema<IProduct>(
     isActive: { type: Boolean, default: true },
     createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
     type: { type: Schema.Types.ObjectId, ref: "Type", required: true },
+    category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
+    mainCategory: {
+      type: Schema.Types.ObjectId,
+      ref: "MainCategory",
+      required: true,
+    },
+    mainCategorySlug: { type: String, required: true },
+    categorySlug: { type: String, required: true },
+    typeSlug: { type: String, required: true },
   },
   {
     timestamps: true,

@@ -6,13 +6,17 @@ export interface IProduct {
   description?: string[];
   details?: string;
   images?: string[];
-  category: string;
   basePrice: number;
   discountPrice?: number;
   totalStock: number; // calculated field
   isActive: boolean;
   createdBy: Types.ObjectId; // user who created
   type: Types.ObjectId; // user who created
+  category: Types.ObjectId; // user who created
+  mainCategory: Types.ObjectId; // user who created
+  mainCategorySlug: string;
+  categorySlug: string;
+  typeSlug: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

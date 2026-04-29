@@ -2,14 +2,14 @@ import { z } from "zod";
 
 const createTypeValidation = z.object({
   name: z.string().min(1, "Name is required"),
-  category: z.string({
-    error: "Category ID is required",
+  slug: z.string({
+    error: "Slug is required",
   }),
 });
 
 const updateTypeValidation = z.object({
   name: z.string().min(1).optional(),
-  category: z.string().optional(),
+  slug: z.string().min(1).optional(),
 });
 
 export const TypeValidations = {

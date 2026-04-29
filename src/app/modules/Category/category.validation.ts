@@ -7,15 +7,15 @@ const createCategoryValidation = z.object({
     })
     .min(1),
 
-  mainCategory: z.string({
-    error: "Main Category ID is required",
+  slug: z.string({
+    error: "Slug is required",
   }),
 });
 
 const updateCategoryValidation = z.object({
   body: z.object({
     name: z.string().min(1).optional(),
-    mainCategory: z.string().optional(),
+    slug: z.string().min(1).optional(),
   }),
 });
 
