@@ -2,8 +2,6 @@ import { Request, Response } from "express";
 import httpStatus from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
 import { ProductServices } from "./product.service";
-import { ProductValidations } from "./product.validation";
-import { validateRequest } from "../../../app/middlewares/validateRequest";
 import catchAsync from "../../../utils/catchAsync";
 import { sendResponse } from "../../../utils/sendResponse";
 

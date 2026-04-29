@@ -2,7 +2,6 @@ import { z } from "zod";
 
 const createProductValidation = z.object({
   name: z.string({ error: "Name is required" }).min(1),
-  category: z.string({ error: "Category is required" }).min(1),
   description: z.array(z.string()).optional(),
   details: z.string().optional(),
 
@@ -10,14 +9,20 @@ const createProductValidation = z.object({
   discountPrice: z.coerce.number().min(0).optional(),
   totalStock: z.coerce.number().min(0).optional(),
 
-  isActive: z.boolean().optional(),
+  // Product validation schema (Backend)
+  isActive: z.preprocess((val) => {
+    if (typeof val === "string") {
+      if (val === "true") return true;
+      if (val === "false") return false;
+    }
+    return val;
+  }, z.boolean().optional().default(true)),
 
   type: z.string({ error: "Type ID is required" }),
 });
 
 const updateProductValidation = z.object({
   name: z.string().optional(),
-  category: z.string().optional(),
   images: z.array(z.string()).optional(),
   description: z.array(z.string()).optional(),
   details: z.string().optional(),

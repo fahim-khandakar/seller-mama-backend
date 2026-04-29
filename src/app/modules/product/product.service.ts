@@ -51,31 +51,77 @@ const createProduct = async (
 };
 
 const getAllProducts = async (query: Record<string, string>) => {
-  const queryBuilder = new QueryBuilder(
-    Product.find().populate("createdBy", "name email"),
-    query,
-  );
+  const { minPrice, maxPrice, mainCategory, category, ...remainingQuery } =
+    query;
 
+  // 1. Price Range logic build kora
+  const priceFilter: any = {};
+  if (minPrice || maxPrice) {
+    priceFilter.basePrice = {};
+    if (minPrice) priceFilter.basePrice.$gte = Number(minPrice);
+    if (maxPrice) priceFilter.basePrice.$lte = Number(maxPrice);
+  }
+
+  // 2. Initial Query Build (With Price Filter)
+  let productQuery = Product.find(priceFilter)
+    .populate({
+      path: "type",
+      populate: {
+        path: "category",
+        populate: {
+          path: "mainCategory",
+        },
+      },
+    })
+    .populate("createdBy", "name email");
+
+  // 3. QueryBuilder initialize kora
+  const queryBuilder = new QueryBuilder(productQuery, remainingQuery);
+
+  // 4. Execution
   const productsData = queryBuilder
-    .filter()
+    .filter() // Baaki field (like type ID) eikhan diye filter hobe
     .search(productSearchableFields)
     .sort()
     .fields()
     .paginate();
 
-  const [data, meta] = await Promise.all([
-    productsData.build(),
-    queryBuilder.getMeta(),
-  ]);
+  let data = await productsData.build();
+
+  // 5. MainCategory ebong Category diye Manual Filtering
+  // Karon e gulo deeply nested, QueryBuilder direct database level-e nested populate filter korte pare na
+  if (mainCategory || category) {
+    data = data.filter((product: any) => {
+      const matchCategory = category
+        ? product.type?.category?._id.toString() === category
+        : true;
+
+      const matchMainCategory = mainCategory
+        ? product.type?.category?.mainCategory?._id.toString() === mainCategory
+        : true;
+
+      return matchCategory && matchMainCategory;
+    });
+  }
+
+  const meta = await queryBuilder.getMeta();
 
   return { data, meta };
 };
 
 const getSingleProduct = async (id: string) => {
-  const product = await Product.findById(id).populate(
-    "createdBy",
-    "name email",
-  );
+  const product = await Product.findById(id)
+    .populate({
+      path: "type",
+      populate: {
+        path: "category",
+        populate: {
+          path: "mainCategory",
+        },
+      },
+    })
+    .populate("createdBy", "name email");
+
   return { data: product };
 };
 
