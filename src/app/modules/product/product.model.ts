@@ -7,6 +7,7 @@ const productSchema = new Schema<IProduct>(
     category: { type: String, required: true },
     images: [{ type: String }],
     description: [{ type: String }],
+    details: { type: String },
     basePrice: { type: Number, required: true },
     discountPrice: { type: Number },
     totalStock: { type: Number, default: 0 },

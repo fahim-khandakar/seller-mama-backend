@@ -4,6 +4,7 @@ export interface IProduct {
   _id?: Types.ObjectId;
   name: string;
   description?: string[];
+  details?: string;
   images?: string[];
   category: string;
   basePrice: number;
