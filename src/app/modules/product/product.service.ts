@@ -110,12 +110,12 @@ const getSingleProduct = async (id: string) => {
   const product = await Product.findById(id)
     .populate({
       path: "type",
-      populate: {
-        path: "category",
-        populate: {
-          path: "mainCategory",
-        },
-      },
+    })
+    .populate({
+      path: "category",
+    })
+    .populate({
+      path: "mainCategory",
     })
     .populate("createdBy", "name email");
 
