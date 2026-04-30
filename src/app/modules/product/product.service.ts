@@ -22,8 +22,6 @@ const createProduct = async (
   userId: string,
   files: Express.Multer.File[],
 ) => {
-  // Files are already uploaded to Cloudinary by multer
-  // Just collect the URLs
   const imageUrls: string[] = files
     .map((file) => file.path)
     .filter((url) => url && typeof url === "string");
@@ -87,6 +85,10 @@ const getAllProducts = async (query: Record<string, string>) => {
   if (remainingQuery.mainCategory) {
     remainingQuery.mainCategorySlug = remainingQuery.mainCategory;
     delete remainingQuery.mainCategory;
+  }
+  if (remainingQuery.type) {
+    remainingQuery.typeSlug = remainingQuery.type;
+    delete remainingQuery.type;
   }
 
   const queryBuilder = new QueryBuilder(
