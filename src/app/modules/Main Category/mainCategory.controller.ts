@@ -16,7 +16,6 @@ const createMainCategory = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllMainCategories = catchAsync(async (req: Request, res: Response) => {
-  console.log("req", req.query);
   const result = await MainCategoryServices.getAllMainCategories(
     req.query as Record<string, string>,
   );

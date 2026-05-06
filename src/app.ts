@@ -8,6 +8,7 @@ import { globalErrorHandler } from "./app/middlewares/globalErrorHandler";
 import notFound from "./app/middlewares/notFound";
 import { envVars } from "./config/env";
 import { router } from "./app/routes";
+import morgan from "morgan";
 
 const app = express();
 
@@ -16,7 +17,7 @@ app.use(
     secret: envVars.EXPRESS_SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-  })
+  }),
 );
 app.use(passport.initialize());
 app.use(passport.session());
@@ -28,9 +29,9 @@ app.use(
   cors({
     origin: envVars.FRONTEND_URL,
     credentials: true,
-  })
+  }),
 );
-
+app.use(morgan("dev"));
 app.use("/api/v1", router);
 
 app.get("/", (req: Request, res: Response) => {
