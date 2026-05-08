@@ -5,6 +5,8 @@ import { Product } from "../product/product.model";
 import { QueryBuilder } from "../../../utils/QueryBuilder";
 import { orderSearchableFields } from "./order.constant";
 import { ENUM_ORDER_STATUS, TOrderStatus } from "../../../enums/order";
+import { validateCoupon } from "../coupon/coupon.utils";
+import { Coupon } from "../coupon/coupon.model";
 
 /**
  * 🔹 Create Types
@@ -17,7 +19,7 @@ type CreateOrderItemInput = {
 
 type CreateOrderPayload = Omit<
   IOrder,
-  "items" | "status" | "soldBy" | "totalAmount" | "finalAmount"
+  "items" | "status" | "soldBy" | "totalAmount" | "finalAmount" | "coupon"
 > & {
   items: CreateOrderItemInput[];
 };
@@ -25,7 +27,10 @@ type CreateOrderPayload = Omit<
 /**
  * 🔹 Create Order
  */
-const createOrder = async (payload: CreateOrderPayload, userId: string) => {
+const createOrder = async (
+  payload: CreateOrderPayload & { coupon?: string },
+  userId: string,
+) => {
   const session = await Order.startSession();
   session.startTransaction();
 
@@ -35,6 +40,7 @@ const createOrder = async (payload: CreateOrderPayload, userId: string) => {
     }
 
     let totalAmount = 0;
+
     const processedItems: {
       product: Types.ObjectId;
       quantity: number;
@@ -52,10 +58,6 @@ const createOrder = async (payload: CreateOrderPayload, userId: string) => {
         throw new Error("Quantity must be greater than 0");
       }
 
-      if (item.sellPrice < 0) {
-        throw new Error("Sell price cannot be negative");
-      }
-
       totalAmount += item.quantity * item.sellPrice;
 
       processedItems.push({
@@ -65,31 +67,60 @@ const createOrder = async (payload: CreateOrderPayload, userId: string) => {
       });
     }
 
-    const discount = payload.discountAmount ?? 0;
+    /**
+     * 💥 COUPON LOGIC
+     */
+    let discount = 0;
+
+    let couponDoc = null;
+
+    if (payload.coupon) {
+      const result = await validateCoupon(payload.coupon, totalAmount);
+
+      discount = result.discount;
+      couponDoc = result.couponId;
+    }
 
     if (discount < 0) {
-      throw new Error("Discount cannot be negative");
+      throw new Error("Invalid discount");
     }
 
     if (discount > totalAmount) {
-      throw new Error("Discount cannot be greater than total amount");
+      discount = totalAmount;
     }
 
     const finalAmount = totalAmount - discount;
 
+    /**
+     * 💥 CREATE ORDER
+     */
     const order = await Order.create(
       [
         {
           ...payload,
           items: processedItems,
           totalAmount,
+          discountAmount: discount,
           finalAmount,
           soldBy: new Types.ObjectId(userId),
-          status: ENUM_ORDER_STATUS.PENDING, // ✅ using enum
+          status: ENUM_ORDER_STATUS.PENDING,
         },
       ],
       { session },
     );
+
+    /**
+     * 💥 INCREMENT COUPON USAGE (IMPORTANT)
+     */
+    if (couponDoc && discount > 0) {
+      await Coupon.findByIdAndUpdate(
+        couponDoc._id,
+        {
+          $inc: { usedCount: 1 },
+        },
+        { session },
+      );
+    }
 
     await session.commitTransaction();
     return order[0];

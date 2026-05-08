@@ -33,7 +33,7 @@ const createOrderValidation = z.object({
   paymentMethod: z
     .enum(["BKASH", "ROCKET", "NAGAD", "CARD", "CASH"])
     .optional()
-    .default("CASH"),
+    .default("BKASH"),
 
   status: z
     .enum([
@@ -48,6 +48,7 @@ const createOrderValidation = z.object({
     .default("PENDING"),
 
   soldBy: z.string().optional(),
+  coupon: z.string().optional(),
 });
 
 /**
