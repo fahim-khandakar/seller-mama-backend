@@ -6,6 +6,7 @@ import { OrderRoutes } from "../modules/order/order.route";
 import { MainCategoryRoutes } from "../modules/Main Category/mainCategory.route";
 import { CategoryRoutes } from "../modules/Category/category.route";
 import { TypeRoutes } from "../modules/Type/type.route";
+import { CouponRoutes } from "../modules/coupon/coupon.route";
 
 export const router = Router();
 
@@ -37,6 +38,10 @@ const moduleRoutes = [
   {
     path: "/types",
     route: TypeRoutes,
+  },
+  {
+    path: "/coupons",
+    route: CouponRoutes,
   },
 ];
 

@@ -15,6 +15,9 @@ const updateCoupon = async (id: string, payload: Partial<ICoupon>) => {
     runValidators: true,
   });
 };
+const getById = async (id: string) => {
+  return await Coupon.findById(id);
+};
 
 const getAllCoupons = async () => {
   return await Coupon.find().populate("createdBy", "name email");
@@ -33,4 +36,5 @@ export const CouponService = {
   updateCoupon,
   deleteCoupon,
   getAllCoupons,
+  getById,
 };

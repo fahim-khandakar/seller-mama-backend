@@ -1,65 +1,72 @@
-import z from "zod";
-import { IsActive, Role } from "./coupon.interface";
+import { z } from "zod";
+import { ENUM_COUPON_STATUS, ENUM_COUPON_TYPE } from "../../../enums/coupon";
 
-export const createUserZodSchema = z.object({
-  name: z
-    .string({ error: "Name must be string" })
-    .min(2, { message: "Name must be at least 2 characters long." })
-    .max(50, { message: "Name cannot exceed 50 characters." }),
-  email: z
-    .string({ error: "Email must be string" })
-    .email({ message: "Invalid email address format." })
-    .min(5, { message: "Email must be at least 5 characters long." })
-    .max(100, { message: "Email cannot exceed 100 characters." }),
-  password: z
-    .string({ error: "Password must be string" })
-    .min(8, { message: "Password must be at least 8 characters long." })
-    .regex(/^(?=.*[A-Z])/, {
-      message: "Password must contain at least 1 uppercase letter.",
+/**
+ * 🔥 Create Coupon Validation
+ */
+export const createCouponZodSchema = z.object({
+  code: z
+    .string({
+      error: "Coupon code is required",
     })
-    .regex(/^(?=.*[!@#$%^&*])/, {
-      message: "Password must contain at least 1 special character.",
+    .min(3, "Coupon code must be at least 3 characters")
+    .max(20, "Coupon code cannot exceed 20 characters")
+    .toUpperCase(),
+
+  type: z.enum(Object.values(ENUM_COUPON_TYPE) as [string, ...string[]], {
+    error: "Coupon type is required",
+  }),
+
+  value: z
+    .number({
+      error: "Coupon value is required",
     })
-    .regex(/^(?=.*\d)/, {
-      message: "Password must contain at least 1 number.",
-    }),
-  phone: z
-    .string({ error: "Phone Number must be string" })
-    .regex(/^(?:\+8801\d{9}|01\d{9})$/, {
-      message:
-        "Phone number must be valid for Bangladesh. Format: +8801XXXXXXXXX or 01XXXXXXXXX",
-    })
+    .min(1, "Coupon value must be greater than 0"),
+
+  minOrderAmount: z
+    .number()
+    .min(0, "Minimum order must be positive")
     .optional(),
-  address: z
-    .string({ error: "Address must be string" })
-    .max(200, { message: "Address cannot exceed 200 characters." })
+
+  maxDiscountAmount: z
+    .number()
+    .min(0, "Max discount must be positive")
     .optional(),
+
+  usageLimit: z
+    .number()
+    .int()
+    .min(1, "Usage limit must be at least 1")
+    .optional(),
+
+  validFrom: z.coerce.date({
+    error: "Valid from date is required",
+  }),
+
+  validUntil: z.coerce.date({
+    error: "Valid until date is required",
+  }),
 });
-export const updateUserZodSchema = z.object({
-  name: z
-    .string({ error: "Name must be string" })
-    .min(2, { message: "Name must be at least 2 characters long." })
-    .max(50, { message: "Name cannot exceed 50 characters." })
+export const updateCouponZodSchema = z.object({
+  code: z.string().min(3).max(20).toUpperCase().optional(),
+
+  type: z
+    .enum(Object.values(ENUM_COUPON_TYPE) as [string, ...string[]])
     .optional(),
 
-  phone: z
-    .string({ error: "Phone Number must be string" })
-    .regex(/^(?:\+8801\d{9}|01\d{9})$/, {
-      message:
-        "Phone number must be valid for Bangladesh. Format: +8801XXXXXXXXX or 01XXXXXXXXX",
-    })
+  value: z.number().min(1).optional(),
+
+  minOrderAmount: z.number().min(0).optional(),
+
+  maxDiscountAmount: z.number().min(0).optional(),
+
+  usageLimit: z.number().int().min(1).optional(),
+
+  status: z
+    .enum(Object.values(ENUM_COUPON_STATUS) as [string, ...string[]])
     .optional(),
-  role: z
-    // .enum(["ADMIN", "GUIDE", "USER", "SUPER_ADMIN"])
-    .enum(Object.values(Role) as [string])
-    .optional(),
-  isActive: z.enum(Object.values(IsActive) as [string]).optional(),
-  isDeleted: z.boolean({ error: "isDeleted must be true or false" }).optional(),
-  isVerified: z
-    .boolean({ error: "isVerified must be true or false" })
-    .optional(),
-  address: z
-    .string({ error: "Address must be string" })
-    .max(200, { message: "Address cannot exceed 200 characters." })
-    .optional(),
+
+  validFrom: z.coerce.date().optional(),
+
+  validUntil: z.coerce.date().optional(),
 });

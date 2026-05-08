@@ -5,9 +5,16 @@ export const applyCouponLogic = async (code: string, orderAmount: number) => {
   const coupon = await Coupon.findOne({
     code: code.toUpperCase(),
   });
-
+  console.log("code", code, "amount", orderAmount);
   if (!coupon) {
     throw new Error("Invalid coupon code");
+  }
+
+  const amount = Number(orderAmount);
+  const value = Number(coupon.value);
+
+  if (isNaN(amount) || isNaN(value)) {
+    throw new Error("Invalid numeric data");
   }
 
   if (coupon.status !== ENUM_COUPON_STATUS.ACTIVE) {
@@ -24,24 +31,24 @@ export const applyCouponLogic = async (code: string, orderAmount: number) => {
     throw new Error("Coupon usage limit reached");
   }
 
-  if (coupon.minOrderAmount && orderAmount < coupon.minOrderAmount) {
+  if (coupon.minOrderAmount && amount < coupon.minOrderAmount) {
     throw new Error(`Minimum order amount is ${coupon.minOrderAmount}`);
   }
 
   let discount = 0;
 
   if (coupon.type === ENUM_COUPON_TYPE.PERCENTAGE) {
-    discount = (orderAmount * coupon.value) / 100;
+    discount = (amount * value) / 100;
 
     if (coupon.maxDiscountAmount && discount > coupon.maxDiscountAmount) {
       discount = coupon.maxDiscountAmount;
     }
   } else {
-    discount = coupon.value;
+    discount = value;
   }
 
-  if (discount > orderAmount) {
-    discount = orderAmount;
+  if (discount > amount) {
+    discount = amount;
   }
 
   return {
