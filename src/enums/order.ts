@@ -1,0 +1,11 @@
+export const ENUM_ORDER_STATUS = {
+  PENDING: "PENDING",
+  CONFIRMED: "CONFIRMED",
+  IN_PROGRESS: "IN_PROGRESS",
+  SHIPPED: "SHIPPED",
+  DELIVERED: "DELIVERED",
+  CANCELLED: "CANCELLED",
+} as const;
+
+export type TOrderStatus =
+  (typeof ENUM_ORDER_STATUS)[keyof typeof ENUM_ORDER_STATUS];

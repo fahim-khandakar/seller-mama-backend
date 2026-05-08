@@ -4,7 +4,11 @@ import { Order } from "./order.model";
 import { Product } from "../product/product.model";
 import { QueryBuilder } from "../../../utils/QueryBuilder";
 import { orderSearchableFields } from "./order.constant";
+import { ENUM_ORDER_STATUS, TOrderStatus } from "../../../enums/order";
 
+/**
+ * 🔹 Create Types
+ */
 type CreateOrderItemInput = {
   product: string;
   quantity: number;
@@ -18,33 +22,60 @@ type CreateOrderPayload = Omit<
   items: CreateOrderItemInput[];
 };
 
+/**
+ * 🔹 Create Order
+ */
 const createOrder = async (payload: CreateOrderPayload, userId: string) => {
   const session = await Order.startSession();
   session.startTransaction();
 
   try {
-    let totalAmount = 0;
-    const processedItems: any[] = [];
+    if (!payload.items?.length) {
+      throw new Error("At least one order item is required");
+    }
 
-    for (const item of payload.items || []) {
+    let totalAmount = 0;
+    const processedItems: {
+      product: Types.ObjectId;
+      quantity: number;
+      sellPrice: number;
+    }[] = [];
+
+    for (const item of payload.items) {
       const product = await Product.findById(item.product).session(session);
 
       if (!product) {
         throw new Error(`Product ${item.product} not found`);
       }
 
-      // No stock checking anymore
+      if (item.quantity <= 0) {
+        throw new Error("Quantity must be greater than 0");
+      }
+
+      if (item.sellPrice < 0) {
+        throw new Error("Sell price cannot be negative");
+      }
 
       totalAmount += item.quantity * item.sellPrice;
 
       processedItems.push({
-        product: item.product,
+        product: new Types.ObjectId(item.product),
         quantity: item.quantity,
         sellPrice: item.sellPrice,
       });
     }
 
-    const finalAmount = totalAmount - (payload.discountAmount || 0);
+    const discount = payload.discountAmount ?? 0;
+
+    if (discount < 0) {
+      throw new Error("Discount cannot be negative");
+    }
+
+    if (discount > totalAmount) {
+      throw new Error("Discount cannot be greater than total amount");
+    }
+
+    const finalAmount = totalAmount - discount;
 
     const order = await Order.create(
       [
@@ -53,8 +84,8 @@ const createOrder = async (payload: CreateOrderPayload, userId: string) => {
           items: processedItems,
           totalAmount,
           finalAmount,
-          status: "Pending", // default দিলে safe
           soldBy: new Types.ObjectId(userId),
+          status: ENUM_ORDER_STATUS.PENDING, // ✅ using enum
         },
       ],
       { session },
@@ -70,6 +101,9 @@ const createOrder = async (payload: CreateOrderPayload, userId: string) => {
   }
 };
 
+/**
+ * 🔹 Get All Orders
+ */
 const getAllOrders = async (query: Record<string, string>) => {
   const queryBuilder = new QueryBuilder(
     Order.find()
@@ -93,26 +127,41 @@ const getAllOrders = async (query: Record<string, string>) => {
   return { data, meta };
 };
 
+/**
+ * 🔹 Get Single Order
+ */
 const getSingleOrder = async (id: string) => {
   const order = await Order.findById(id)
     .populate("items.product", "name category basePrice discountPrice")
     .populate("soldBy", "name email");
-  return { data: order };
-};
 
-const updateOrderStatus = async (
-  orderId: string,
-  status: string,
-  userId: string,
-) => {
-  const order = await Order.findById(orderId);
   if (!order) {
     throw new Error("Order not found");
   }
 
-  // Check if user is authorized (only seller or admin can update)
-  if (order.soldBy.toString() !== userId) {
-    // TODO: Add role check for admin/superadmin
+  return { data: order };
+};
+
+/**
+ * 🔹 Update Order Status
+ */
+const updateOrderStatus = async (
+  orderId: string,
+  status: TOrderStatus,
+  userId: string,
+) => {
+  // extra safety check (optional)
+  if (!Object.values(ENUM_ORDER_STATUS).includes(status)) {
+    throw new Error("Invalid order status");
+  }
+
+  const order = await Order.findById(orderId);
+
+  if (!order) {
+    throw new Error("Order not found");
+  }
+
+  if (!order.soldBy || order.soldBy.toString() !== userId) {
     throw new Error("Unauthorized to update order");
   }
 

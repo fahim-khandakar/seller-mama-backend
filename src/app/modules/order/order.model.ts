@@ -1,11 +1,13 @@
 import { Schema, model } from "mongoose";
 import { IOrder, IOrderItem } from "./order.interface";
+import { ENUM_ORDER_STATUS } from "../../../enums/order";
 
 const orderItemSchema = new Schema<IOrderItem>({
   product: { type: Schema.Types.ObjectId, ref: "Product", required: true },
   quantity: { type: Number, required: true },
+  productSize: { type: String },
   sellPrice: { type: Number, required: true },
-  purchasePrice: { type: Number, required: true },
+  purchasePrice: { type: Number },
   nameAndNumber: { type: String },
 });
 
@@ -18,8 +20,8 @@ const orderSchema = new Schema<IOrder>(
     customerName: { type: String, required: true },
     customerPhone: { type: String, required: true },
     customerAddress: { type: String, required: true },
-    customerEmail: { type: String },
-    transactionId: { type: String },
+    customerEmail: { type: String, required: true },
+    transactionId: { type: String, required: true },
     paymentMethod: {
       type: String,
       default: "BKASH",
@@ -27,17 +29,10 @@ const orderSchema = new Schema<IOrder>(
     },
     status: {
       type: String,
-      enum: [
-        "PENDING",
-        "CONFIRMED",
-        "IN_PROGRESS",
-        "SHIPPED",
-        "DELIVERED",
-        "CANCELLED",
-      ],
-      default: "PENDING",
+      enum: ENUM_ORDER_STATUS,
+      default: ENUM_ORDER_STATUS.PENDING,
     },
-    soldBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    soldBy: { type: Schema.Types.ObjectId, ref: "User" },
   },
   {
     timestamps: true,
