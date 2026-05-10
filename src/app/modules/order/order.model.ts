@@ -20,7 +20,7 @@ const orderSchema = new Schema<IOrder>(
     customerName: { type: String, required: true },
     customerPhone: { type: String, required: true },
     customerAddress: { type: String, required: true },
-    customerEmail: { type: String, required: true },
+    customerEmail: { type: String },
     transactionId: { type: String, required: true },
     paymentMethod: {
       type: String,
@@ -32,7 +32,7 @@ const orderSchema = new Schema<IOrder>(
       enum: ENUM_ORDER_STATUS,
       default: ENUM_ORDER_STATUS.PENDING,
     },
-    soldBy: { type: Schema.Types.ObjectId, ref: "User" },
+    soldBy: { type: Schema.Types.ObjectId, ref: "User", required: false },
   },
   {
     timestamps: true,

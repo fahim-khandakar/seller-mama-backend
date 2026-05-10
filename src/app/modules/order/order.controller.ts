@@ -8,7 +8,8 @@ import { sendResponse } from "../../../utils/sendResponse";
 
 const createOrder = catchAsync(async (req: Request, res: Response) => {
   const validatedData = OrderValidations.createOrderValidation.parse(req.body);
-  const userId = (req.user as JwtPayload).userId as string;
+
+  const userId = validatedData.soldBy ? validatedData.soldBy : undefined;
 
   const result = await OrderServices.createOrder(validatedData, userId);
 

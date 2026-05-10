@@ -17,7 +17,7 @@ export interface IOrder {
   finalAmount: number;
   customerName: string;
   customerPhone: string;
-  customerEmail: string;
+  customerEmail?: string;
   customerAddress: string;
   transactionId: string;
   paymentMethod?: "BKASH" | "ROCKET" | "NAGAD" | "CARD" | "CASH";

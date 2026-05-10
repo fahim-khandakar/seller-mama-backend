@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.post(
   "/",
-  checkAuth(Role.ADMIN, Role.MODERATOR, Role.SUPER_ADMIN),
+  // checkAuth(Role.ADMIN, Role.MODERATOR, Role.SUPER_ADMIN),
   validateRequest(OrderValidations.createOrderValidation),
   OrderControllers.createOrder,
 );

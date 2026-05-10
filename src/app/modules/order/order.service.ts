@@ -29,7 +29,7 @@ type CreateOrderPayload = Omit<
  */
 const createOrder = async (
   payload: CreateOrderPayload & { coupon?: string },
-  userId: string,
+  userId?: string, // ✅ optional করা হলো
 ) => {
   const session = await Order.startSession();
   session.startTransaction();
@@ -71,12 +71,10 @@ const createOrder = async (
      * 💥 COUPON LOGIC
      */
     let discount = 0;
-
     let couponDoc = null;
 
     if (payload.coupon) {
       const result = await validateCoupon(payload.coupon, totalAmount);
-
       discount = result.discount;
       couponDoc = result.couponId;
     }
@@ -94,30 +92,25 @@ const createOrder = async (
     /**
      * 💥 CREATE ORDER
      */
-    const order = await Order.create(
-      [
-        {
-          ...payload,
-          items: processedItems,
-          totalAmount,
-          discountAmount: discount,
-          finalAmount,
-          soldBy: new Types.ObjectId(userId),
-          status: ENUM_ORDER_STATUS.PENDING,
-        },
-      ],
-      { session },
-    );
+    const orderPayload: any = {
+      ...payload,
+      items: processedItems,
+      totalAmount,
+      discountAmount: discount,
+      finalAmount,
+      status: ENUM_ORDER_STATUS.PENDING,
+      soldBy: userId || undefined,
+    };
+
+    const order = await Order.create([orderPayload], { session });
 
     /**
-     * 💥 INCREMENT COUPON USAGE (IMPORTANT)
+     * 💥 INCREMENT COUPON USAGE
      */
     if (couponDoc && discount > 0) {
       await Coupon.findByIdAndUpdate(
         couponDoc._id,
-        {
-          $inc: { usedCount: 1 },
-        },
+        { $inc: { usedCount: 1 } },
         { session },
       );
     }
@@ -131,7 +124,6 @@ const createOrder = async (
     session.endSession();
   }
 };
-
 /**
  * 🔹 Get All Orders
  */
@@ -163,7 +155,8 @@ const getAllOrders = async (query: Record<string, string>) => {
  */
 const getSingleOrder = async (id: string) => {
   const order = await Order.findById(id)
-    .populate("items.product", "name category basePrice discountPrice")
+    .populate("items", "nameAndNumber")
+    .populate("items.product", "name category basePrice discountPrice images")
     .populate("soldBy", "name email");
 
   if (!order) {

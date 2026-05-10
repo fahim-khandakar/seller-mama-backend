@@ -26,7 +26,7 @@ const createOrderValidation = z.object({
   customerName: z.string().min(1, "Customer name is required"),
   customerPhone: z.string().min(1, "Customer phone is required"),
   customerAddress: z.string().min(1, "Customer address is required"),
-  customerEmail: z.string().email("Invalid email address"),
+  customerEmail: z.string().email("Invalid email address").optional(),
 
   transactionId: z.string().min(1, "Transaction ID is required"),
 
