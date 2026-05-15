@@ -17,6 +17,7 @@ const orderSchema = new Schema<IOrder>(
     totalAmount: { type: Number, required: true },
     discountAmount: { type: Number, default: 0 },
     finalAmount: { type: Number, required: true },
+    paidAmount: { type: Number, required: true },
     customerName: { type: String, required: true },
     customerPhone: { type: String, required: true },
     customerAddress: { type: String, required: true },

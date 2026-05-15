@@ -15,6 +15,7 @@ export interface IOrder {
   totalAmount: number;
   discountAmount?: number;
   finalAmount: number;
+  paidAmount?: number;
   customerName: string;
   customerPhone: string;
   customerEmail?: string;

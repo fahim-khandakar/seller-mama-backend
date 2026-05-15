@@ -22,6 +22,8 @@ const createOrderValidation = z.object({
   discountAmount: z.number().min(0).optional().default(0),
 
   finalAmount: z.number().min(0, "Final amount must be positive"),
+  paidAmount: z.number().min(0, "Final amount must be positive"),
+  deliveryCharge: z.number().min(0, "Final amount must be positive"),
 
   customerName: z.string().min(1, "Customer name is required"),
   customerPhone: z.string().min(1, "Customer phone is required"),

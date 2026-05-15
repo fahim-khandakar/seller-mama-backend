@@ -15,6 +15,7 @@ type CreateOrderItemInput = {
   product: string;
   quantity: number;
   sellPrice: number;
+  nameAndNumber?: string;
 };
 
 type CreateOrderPayload = Omit<
@@ -22,6 +23,7 @@ type CreateOrderPayload = Omit<
   "items" | "status" | "soldBy" | "totalAmount" | "finalAmount" | "coupon"
 > & {
   items: CreateOrderItemInput[];
+  deliveryCharge: number;
 };
 
 /**
@@ -45,6 +47,7 @@ const createOrder = async (
       product: Types.ObjectId;
       quantity: number;
       sellPrice: number;
+      nameAndNumber?: string;
     }[] = [];
 
     for (const item of payload.items) {
@@ -64,6 +67,7 @@ const createOrder = async (
         product: new Types.ObjectId(item.product),
         quantity: item.quantity,
         sellPrice: item.sellPrice,
+        nameAndNumber: item.nameAndNumber || "",
       });
     }
 
@@ -95,9 +99,9 @@ const createOrder = async (
     const orderPayload: any = {
       ...payload,
       items: processedItems,
-      totalAmount,
+      totalAmount: totalAmount + payload.deliveryCharge,
       discountAmount: discount,
-      finalAmount,
+      finalAmount: finalAmount + payload.deliveryCharge,
       status: ENUM_ORDER_STATUS.PENDING,
       soldBy: userId || undefined,
     };
