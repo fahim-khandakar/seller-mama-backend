@@ -15,7 +15,6 @@ import { envVars } from "../../../config/env";
 const credentialsLogin = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     // const loginInfo = await AuthServices.credentialsLogin(req.body)
-console.log("hello world", req.body);
 
     passport.authenticate("local", async (err: any, user: any, info: any) => {
       if (err) {
@@ -64,7 +63,7 @@ console.log("hello world", req.body);
     //     httpOnly: true,
     //     secure: false,
     // })
-  }
+  },
 );
 const getNewAccessToken = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -72,11 +71,11 @@ const getNewAccessToken = catchAsync(
     if (!refreshToken) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        "No refresh token recieved from cookies"
+        "No refresh token recieved from cookies",
       );
     }
     const tokenInfo = await AuthServices.getNewAccessToken(
-      refreshToken as string
+      refreshToken as string,
     );
 
     // res.cookie("accessToken", tokenInfo.accessToken, {
@@ -92,7 +91,7 @@ const getNewAccessToken = catchAsync(
       message: "New Access Token Retrived Successfully",
       data: tokenInfo,
     });
-  }
+  },
 );
 const logout = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -113,7 +112,7 @@ const logout = catchAsync(
       message: "User Logged Out Successfully",
       data: null,
     });
-  }
+  },
 );
 const changePassword = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -124,7 +123,7 @@ const changePassword = catchAsync(
     await AuthServices.changePassword(
       oldPassword,
       newPassword,
-      decodedToken as JwtPayload
+      decodedToken as JwtPayload,
     );
 
     sendResponse(res, {
@@ -133,7 +132,7 @@ const changePassword = catchAsync(
       message: "Password Changed Successfully",
       data: null,
     });
-  }
+  },
 );
 const resetPassword = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -147,7 +146,7 @@ const resetPassword = catchAsync(
       message: "Password Changed Successfully",
       data: null,
     });
-  }
+  },
 );
 const setPassword = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -162,7 +161,7 @@ const setPassword = catchAsync(
       message: "Password Changed Successfully",
       data: null,
     });
-  }
+  },
 );
 const forgotPassword = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -176,7 +175,7 @@ const forgotPassword = catchAsync(
       message: "Email Sent Successfully",
       data: null,
     });
-  }
+  },
 );
 const googleCallbackController = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -205,7 +204,7 @@ const googleCallbackController = catchAsync(
     // })
 
     res.redirect(`${envVars.FRONTEND_URL}/${redirectTo}`);
-  }
+  },
 );
 
 export const AuthControllers = {

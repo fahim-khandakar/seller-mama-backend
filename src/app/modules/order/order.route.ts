@@ -24,5 +24,10 @@ router.patch(
   validateRequest(OrderValidations.updateOrderStatusValidation),
   OrderControllers.updateOrderStatus,
 );
+router.delete(
+  "/:orderId",
+  checkAuth(Role.ADMIN, Role.MODERATOR, Role.SUPER_ADMIN),
+  OrderControllers.deleteOrder,
+);
 
 export const OrderRoutes = router;

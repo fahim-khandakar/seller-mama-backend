@@ -7,6 +7,7 @@ import { orderSearchableFields } from "./order.constant";
 import { ENUM_ORDER_STATUS, TOrderStatus } from "../../../enums/order";
 import { validateCoupon } from "../coupon/coupon.utils";
 import { Coupon } from "../coupon/coupon.model";
+import AppError from "../../../error helpers/AppError";
 
 /**
  * 🔹 Create Types
@@ -189,10 +190,6 @@ const updateOrderStatus = async (
     throw new Error("Order not found");
   }
 
-  if (!order.soldBy || order.soldBy.toString() !== userId) {
-    throw new Error("Unauthorized to update order");
-  }
-
   const updatedOrder = await Order.findByIdAndUpdate(
     orderId,
     { status },
@@ -204,9 +201,24 @@ const updateOrderStatus = async (
   return updatedOrder;
 };
 
+const deleteOrder = async (orderId: string, userId: string) => {
+  const order = await Order.findById(orderId);
+  if (!order) {
+    throw new AppError(404, "Order not found");
+  }
+
+  if (order.soldBy.toString() !== userId) {
+    throw new AppError(401, "Unauthorized to delete order");
+  }
+
+  await Order.findByIdAndDelete(orderId);
+  return { message: "Order deleted successfully" };
+};
+
 export const OrderServices = {
   createOrder,
   getAllOrders,
   getSingleOrder,
   updateOrderStatus,
+  deleteOrder,
 };

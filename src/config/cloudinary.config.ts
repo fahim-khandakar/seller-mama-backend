@@ -39,7 +39,6 @@ export const uploadBufferToCloudinary = async (
         .end(buffer);
     });
   } catch (error: any) {
-    console.log(error);
     throw new AppError(401, `Error uploading file ${error.message}`);
   }
 };
@@ -53,11 +52,8 @@ export const deleteImageFromCLoudinary = async (url: string) => {
     const filePart = urlParts[urlParts.length - 1]; // Gets "public_id.extension"
     const public_id = filePart.split(".")[0]; // Gets public_id without extension
 
-    console.log({ url, public_id });
-
     if (public_id) {
       await cloudinary.uploader.destroy(public_id);
-      console.log(`File ${public_id} is deleted from cloudinary`);
     } else {
       throw new Error("Could not extract public_id from URL");
     }

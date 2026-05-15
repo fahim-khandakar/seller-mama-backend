@@ -14,6 +14,4 @@ cron.schedule("0 0 * * *", async () => {
       status: ENUM_COUPON_STATUS.EXPIRED,
     },
   );
-
-  console.log("Expired coupons updated");
 });

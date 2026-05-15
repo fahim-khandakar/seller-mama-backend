@@ -47,7 +47,7 @@ passport.use(
         }
 
         const isGoogleAuthenticated = isUserExist.auths.some(
-          (providerObjects) => providerObjects.provider == "google"
+          (providerObjects) => providerObjects.provider == "google",
         );
 
         if (isGoogleAuthenticated && !isUserExist.password) {
@@ -63,7 +63,7 @@ passport.use(
 
         const isPasswordMatched = await bcrypt.compare(
           password as string,
-          isUserExist.password as string
+          isUserExist.password as string,
         );
 
         if (!isPasswordMatched) {
@@ -72,11 +72,10 @@ passport.use(
 
         return done(null, isUserExist);
       } catch (error) {
-        console.log(error);
         done(error);
       }
-    }
-  )
+    },
+  ),
 );
 
 passport.use(
@@ -90,7 +89,7 @@ passport.use(
       accessToken: string,
       refreshToken: string,
       profile: Profile,
-      done: VerifyCallback
+      done: VerifyCallback,
     ) => {
       try {
         const email = profile.emails?.[0].value;
@@ -138,11 +137,10 @@ passport.use(
 
         return done(null, isUserExist);
       } catch (error) {
-        console.log("Google Strategy Error", error);
         return done(error);
       }
-    }
-  )
+    },
+  ),
 );
 
 // frontend localhost:5173/login?redirect=/booking -> localhost:5000/api/v1/auth/google?redirect=/booking -> passport -> Google OAuth Consent -> gmail login -> successful -> callback url localhost:5000/api/v1/auth/google/callback -> db store -> token
@@ -160,7 +158,6 @@ passport.deserializeUser(async (id: string, done: any) => {
     const user = await User.findById(id);
     done(null, user);
   } catch (error) {
-    console.log(error);
     done(error);
   }
 });

@@ -5,7 +5,7 @@ export const applyCouponLogic = async (code: string, orderAmount: number) => {
   const coupon = await Coupon.findOne({
     code: code.toUpperCase(),
   });
-  console.log("code", code, "amount", orderAmount);
+
   if (!coupon) {
     throw new Error("Invalid coupon code");
   }

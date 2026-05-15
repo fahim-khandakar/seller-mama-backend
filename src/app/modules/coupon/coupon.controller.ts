@@ -26,7 +26,7 @@ const createCoupon = catchAsync(
 
 const validCoupon = catchAsync(async (req: Request, res: Response) => {
   const data = req.body;
-  console.log("data", data);
+
   const result = await validateCoupon(data?.code, data?.orderAmount);
 
   sendResponse(res, {

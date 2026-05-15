@@ -68,9 +68,24 @@ const updateOrderStatus = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const deleteOrder = catchAsync(async (req: Request, res: Response) => {
+  const { orderId } = req.params;
+  const userId = (req.user as JwtPayload).userId as string;
+
+  const result = await OrderServices.deleteOrder(orderId as string, userId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: result.message,
+    data: null,
+  });
+});
+
 export const OrderControllers = {
   createOrder,
   getAllOrders,
   getSingleOrder,
   updateOrderStatus,
+  deleteOrder,
 };

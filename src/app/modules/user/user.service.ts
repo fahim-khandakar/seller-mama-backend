@@ -117,7 +117,7 @@ const getAllUsers = async (query: Record<string, string>) => {
     .sort()
     .fields()
     .paginate();
-  console.log(queryBuilder);
+
   const [data, meta] = await Promise.all([
     usersData.build(),
     queryBuilder.getMeta(),
@@ -140,7 +140,7 @@ const getAllCustomers = async (query: Record<string, string>) => {
     .sort()
     .fields()
     .paginate();
-  console.log(queryBuilder);
+
   const [data, meta] = await Promise.all([
     usersData.build(),
     queryBuilder.getMeta(),
