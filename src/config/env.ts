@@ -47,6 +47,7 @@ interface EnvConfig {
 
 const loadEnvVariables = (): EnvConfig => {
   const requiredEnvVariables: string[] = [
+    "PORT",
     "DB_URL",
     "NODE_ENV",
     "BCRYPT_SALT_ROUND",
