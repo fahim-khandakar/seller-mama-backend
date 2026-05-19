@@ -11,7 +11,7 @@ const router = express.Router();
 router.post(
   "/",
   checkAuth(Role.ADMIN, Role.MODERATOR, Role.SUPER_ADMIN),
-  multerUpload.array("images", 10),
+  multerUpload.array("products", 10),
   validateRequest(ProductValidations.createProductValidation),
   ProductControllers.createProduct,
 );
@@ -23,7 +23,7 @@ router.get("/:productId", ProductControllers.getSingleProduct);
 router.patch(
   "/:productId",
   checkAuth(Role.ADMIN, Role.MODERATOR, Role.SUPER_ADMIN),
-  multerUpload.array("images", 10),
+  multerUpload.array("products", 10),
   validateRequest(ProductValidations.updateProductValidation),
   ProductControllers.updateProduct,
 );
