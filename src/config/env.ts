@@ -94,7 +94,7 @@ const loadEnvVariables = (): EnvConfig => {
   });
 
   return {
-    PORT: process.env.PORT as string,
+    PORT: (process.env.PORT as string) || "5000",
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     DB_URL: process.env.DB_URL!,
     NODE_ENV: process.env.NODE_ENV as "development" | "production",
@@ -136,7 +136,6 @@ const loadEnvVariables = (): EnvConfig => {
       SMTP_HOST: process.env.SMTP_HOST as string,
       SMTP_FROM: process.env.SMTP_FROM as string,
     },
- 
   };
 };
 
