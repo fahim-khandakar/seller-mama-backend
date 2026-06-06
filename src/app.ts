@@ -11,9 +11,9 @@ import { router } from "./app/routes";
 import morgan from "morgan";
 
 const allowedOrigins = [
-  "https://sellermama.com",
+  // "https://sellermama.com",
   "https://www.sellermama.com",
-  "http://localhost:3000",
+  // "http://localhost:3000",
 ];
 
 const app = express();
