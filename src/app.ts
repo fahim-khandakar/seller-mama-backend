@@ -25,20 +25,13 @@ app.use(cookieParser());
 app.use(express.json());
 app.set("trust proxy", 1);
 app.use(express.urlencoded({ extended: true }));
-// app.use(
-//   cors({
-//     origin: envVars.FRONTEND_URL || "https://sellermama.com",
-//     credentials: true,
-//   }),
-// );
 app.use(
   cors({
-    origin: (origin, callback) => {
-      callback(null, origin); // allow all
-    },
+    origin: envVars.FRONTEND_URL || "https://sellermama.com",
     credentials: true,
   }),
 );
+
 app.use(morgan("dev"));
 app.use("/api/v1", router);
 
