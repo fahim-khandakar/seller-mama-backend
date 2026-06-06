@@ -25,9 +25,17 @@ app.use(cookieParser());
 app.use(express.json());
 app.set("trust proxy", 1);
 app.use(express.urlencoded({ extended: true }));
+// app.use(
+//   cors({
+//     origin: envVars.FRONTEND_URL || "https://sellermama.com",
+//     credentials: true,
+//   }),
+// );
 app.use(
   cors({
-    origin: envVars.FRONTEND_URL || "https://sellermama.com",
+    origin: (origin, callback) => {
+      callback(null, origin); // allow all
+    },
     credentials: true,
   }),
 );
