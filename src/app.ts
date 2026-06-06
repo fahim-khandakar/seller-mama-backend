@@ -10,6 +10,12 @@ import { envVars } from "./config/env";
 import { router } from "./app/routes";
 import morgan from "morgan";
 
+const allowedOrigins = [
+  "https://sellermama.com",
+  "https://www.sellermama.com",
+  "http://localhost:3000",
+];
+
 const app = express();
 
 app.use(
@@ -22,12 +28,19 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cookieParser());
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
+// app.use(express.json());
 app.set("trust proxy", 1);
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(
   cors({
-    origin: envVars.FRONTEND_URL,
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   }),
 );
