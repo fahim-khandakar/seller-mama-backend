@@ -3,10 +3,7 @@ import { IProduct } from "./product.interface";
 import { Product } from "./product.model";
 import { QueryBuilder } from "../../../utils/QueryBuilder";
 import { productSearchableFields } from "./product.constant";
-import {
-  uploadBufferToCloudinary,
-  deleteImageFromCLoudinary,
-} from "../../../config/cloudinary.config";
+import { deleteImageFromCLoudinary } from "../../../config/cloudinary.config";
 import AppError from "../../../error helpers/AppError";
 import { MainCategory } from "../Main Category/mainCategory.model";
 import { Category } from "../Category/category.model";
