@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ENUM_ORDER_STATUS } from "../../../enums/order";
 
 /**
  * 🔹 Order Item Validation
@@ -67,7 +68,30 @@ const updateOrderStatusValidation = z.object({
   ]),
 });
 
+export const updateOrderZodSchema = z.object({
+  items: z.array(orderItemValidation).optional(),
+
+  totalAmount: z.number().min(0).optional(),
+  discountAmount: z.number().min(0).optional(),
+  finalAmount: z.number().min(0).optional(),
+  paidAmount: z.number().min(0).optional(),
+
+  customerName: z.string().min(1).optional(),
+  customerPhone: z.string().min(1).optional(),
+  customerAddress: z.string().min(1).optional(),
+  customerEmail: z.string().email().optional(),
+
+  transactionId: z.string().optional(),
+
+  paymentMethod: z
+    .enum(["BKASH", "ROCKET", "NAGAD", "CARD", "CASH"])
+    .optional(),
+
+  status: z.enum(ENUM_ORDER_STATUS).optional(),
+});
+
 export const OrderValidations = {
   createOrderValidation,
   updateOrderStatusValidation,
+  updateOrderZodSchema,
 };

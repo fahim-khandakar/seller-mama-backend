@@ -24,6 +24,12 @@ router.patch(
   validateRequest(OrderValidations.updateOrderStatusValidation),
   OrderControllers.updateOrderStatus,
 );
+router.patch(
+  "/:orderId",
+  checkAuth(Role.ADMIN, Role.MODERATOR, Role.SUPER_ADMIN),
+  validateRequest(OrderValidations.updateOrderZodSchema),
+  OrderControllers.updateOrder,
+);
 router.delete(
   "/:orderId",
   checkAuth(Role.ADMIN, Role.MODERATOR, Role.SUPER_ADMIN),

@@ -203,6 +203,31 @@ const updateOrderStatus = async (
   return updatedOrder;
 };
 
+const updateOrder = async (orderId: string, payload: Partial<IOrder>) => {
+  const order = await Order.findById(orderId);
+
+  if (!order) {
+    throw new AppError(404, "Order not found");
+  }
+
+  // Optional: prevent critical field overwrite (security)
+  const blockedFields = ["_id", "transactionId", "soldBy"];
+  blockedFields.forEach((field) => {
+    if (field in payload) {
+      delete (payload as any)[field];
+    }
+  });
+
+  // Update fields dynamically
+  Object.keys(payload).forEach((key) => {
+    (order as any)[key] = (payload as any)[key];
+  });
+
+  await order.save();
+
+  return order;
+};
+
 const deleteOrder = async (orderId: string, userId: string) => {
   const order = await Order.findById(orderId);
   if (!order) {
@@ -229,4 +254,5 @@ export const OrderServices = {
   getSingleOrder,
   updateOrderStatus,
   deleteOrder,
+  updateOrder,
 };
