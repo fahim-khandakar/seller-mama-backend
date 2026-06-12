@@ -31,7 +31,13 @@ const updateProductValidation = z.object({
   basePrice: z.coerce.number().min(0).optional(),
   discountPrice: z.coerce.number().min(0).optional(),
   totalStock: z.coerce.number().min(0).optional(),
-  isActive: z.boolean().optional(),
+  isActive: z.preprocess((val) => {
+    if (typeof val === "string") {
+      if (val === "true") return true;
+      if (val === "false") return false;
+    }
+    return val;
+  }, z.boolean().optional().default(true)),
   type: z.string().optional(),
   category: z.string().optional(),
   mainCategory: z.string().optional(),
