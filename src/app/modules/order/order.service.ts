@@ -8,6 +8,8 @@ import { ENUM_ORDER_STATUS, TOrderStatus } from "../../../enums/order";
 import { validateCoupon } from "../coupon/coupon.utils";
 import { Coupon } from "../coupon/coupon.model";
 import AppError from "../../../error helpers/AppError";
+import { User } from "../user/user.model";
+import { Role } from "../user/user.interface";
 
 /**
  * 🔹 Create Types
@@ -207,8 +209,14 @@ const deleteOrder = async (orderId: string, userId: string) => {
     throw new AppError(404, "Order not found");
   }
 
-  if (order.soldBy.toString() !== userId) {
-    throw new AppError(401, "Unauthorized to delete order");
+  const isAdmin = await User.findById(userId).select("role");
+
+  if (!isAdmin) {
+    throw new AppError(404, "User not found");
+  }
+
+  if (isAdmin.role !== Role.SUPER_ADMIN) {
+    throw new AppError(403, "Forbidden: Only SUPER_ADMIN can delete orders");
   }
 
   await Order.findByIdAndDelete(orderId);
