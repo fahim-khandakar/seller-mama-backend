@@ -131,7 +131,6 @@ const updateProduct = async (
   if (!product) {
     throw new AppError(404, "Product not found");
   }
-  console.log("payload", payload);
   // Check authorization
   if (product.createdBy.toString() !== userId) {
     throw new AppError(401, "Unauthorized to update product");
