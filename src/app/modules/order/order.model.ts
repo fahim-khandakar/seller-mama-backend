@@ -34,6 +34,7 @@ const orderSchema = new Schema<IOrder>(
       default: ENUM_ORDER_STATUS.PENDING,
     },
     soldBy: { type: Schema.Types.ObjectId, ref: "User", required: false },
+    note: { type: String, required: false },
   },
   {
     timestamps: true,

@@ -52,6 +52,7 @@ const createOrderValidation = z.object({
 
   soldBy: z.string().optional(),
   coupon: z.string().optional(),
+  note: z.string().optional(),
 });
 
 /**
@@ -88,6 +89,7 @@ export const updateOrderZodSchema = z.object({
     .optional(),
 
   status: z.enum(ENUM_ORDER_STATUS).optional(),
+  note: z.string().optional(),
 });
 
 export const OrderValidations = {

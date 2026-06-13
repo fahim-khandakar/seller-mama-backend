@@ -24,6 +24,7 @@ export interface IOrder {
   paymentMethod?: "BKASH" | "ROCKET" | "NAGAD" | "CARD" | "CASH";
   status: "PENDING" | "CONFIRMED" | "SHIPPED" | "DELIVERED" | "CANCELLED";
   soldBy: Types.ObjectId;
+  note?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
