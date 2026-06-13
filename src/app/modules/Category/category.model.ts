@@ -8,6 +8,11 @@ const categorySchema = new Schema<ICategory>(
       required: true,
       trim: true,
     },
+    sizeChartImage: {
+      type: String,
+      required: false,
+      trim: true,
+    },
     slug: {
       type: String,
       required: true,

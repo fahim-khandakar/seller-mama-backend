@@ -17,6 +17,7 @@ export interface IProduct {
   mainCategorySlug: string;
   categorySlug: string;
   typeSlug: string;
+  sizeChartImage?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

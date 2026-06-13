@@ -4,6 +4,7 @@ import { validateRequest } from "../../middlewares/validateRequest";
 import { CategoryValidations } from "./category.validation";
 import { checkAuth } from "../../middlewares/checkAuth";
 import { Role } from "../user/user.interface";
+import { multerUpload } from "../../../config/multer.config";
 
 const router = express.Router();
 
@@ -11,6 +12,7 @@ const router = express.Router();
 router.post(
   "/",
   checkAuth(Role.ADMIN, Role.MODERATOR, Role.SUPER_ADMIN),
+  multerUpload.single("sizeChartImage"),
   validateRequest(CategoryValidations.createCategoryValidation),
   CategoryControllers.createCategory,
 );
@@ -25,6 +27,7 @@ router.get("/:id", CategoryControllers.getSingleCategory);
 router.patch(
   "/:id",
   checkAuth(Role.ADMIN, Role.MODERATOR, Role.SUPER_ADMIN),
+  multerUpload.single("sizeChartImage"),
   validateRequest(CategoryValidations.updateCategoryValidation),
   CategoryControllers.updateCategory,
 );

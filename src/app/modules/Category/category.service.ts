@@ -3,8 +3,15 @@ import AppError from "../../../error helpers/AppError";
 import { ICategory } from "./category.interface";
 import { Category } from "./category.model";
 import { categorySearchableFields } from "./category.constant";
+import { deleteImageFromCLoudinary } from "../../../config/cloudinary.config";
 
-const createCategory = async (payload: ICategory) => {
+const createCategory = async (
+  payload: ICategory,
+  file?: Express.Multer.File,
+) => {
+  if (file?.path) {
+    payload.sizeChartImage = file.path;
+  }
   const result = await Category.create(payload);
   return result;
 };
@@ -37,17 +44,28 @@ const getSingleCategory = async (id: string) => {
   return result;
 };
 
-const updateCategory = async (id: string, payload: Partial<ICategory>) => {
+const updateCategory = async (
+  id: string,
+  payload: Partial<ICategory>,
+  file?: Express.Multer.File,
+) => {
   const isExist = await Category.findById(id);
 
   if (!isExist) {
     throw new AppError(404, "Category not found!");
   }
 
+  if (file?.path) {
+    if (isExist.sizeChartImage) {
+      await deleteImageFromCLoudinary(isExist.sizeChartImage);
+    }
+    payload.sizeChartImage = file.path;
+  }
+
   const result = await Category.findByIdAndUpdate(id, payload, {
     new: true,
     runValidators: true,
-  }).populate("mainCategory");
+  });
 
   return result;
 };

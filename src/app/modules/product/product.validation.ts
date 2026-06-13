@@ -21,6 +21,7 @@ const createProductValidation = z.object({
   type: z.string({ error: "Type ID is required" }),
   category: z.string({ error: "Category ID is required" }),
   mainCategory: z.string({ error: "Main Category ID is required" }),
+  sizeChartImage: z.string().optional(),
 });
 
 const updateProductValidation = z.object({
@@ -41,6 +42,7 @@ const updateProductValidation = z.object({
   type: z.string().optional(),
   category: z.string().optional(),
   mainCategory: z.string().optional(),
+  sizeChartImage: z.string().optional(),
 });
 
 export const ProductValidations = {

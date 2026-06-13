@@ -13,10 +13,8 @@ const createCategoryValidation = z.object({
 });
 
 const updateCategoryValidation = z.object({
-  body: z.object({
-    name: z.string().min(1).optional(),
-    slug: z.string().min(1).optional(),
-  }),
+  name: z.string().min(1).optional(),
+  slug: z.string().min(1).optional(),
 });
 
 export const CategoryValidations = {

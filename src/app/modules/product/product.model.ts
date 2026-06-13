@@ -22,6 +22,7 @@ const productSchema = new Schema<IProduct>(
     mainCategorySlug: { type: String, required: true },
     categorySlug: { type: String, required: true },
     typeSlug: { type: String, required: true },
+    sizeChartImage: { type: String, required: false },
   },
   {
     timestamps: true,
