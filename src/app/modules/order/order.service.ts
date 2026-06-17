@@ -19,6 +19,7 @@ type CreateOrderItemInput = {
   quantity: number;
   sellPrice: number;
   nameAndNumber?: string;
+  productSize?: string;
 };
 
 type CreateOrderPayload = Omit<
@@ -51,6 +52,7 @@ const createOrder = async (
       quantity: number;
       sellPrice: number;
       nameAndNumber?: string;
+      productSize?: string;
     }[] = [];
 
     for (const item of payload.items) {
@@ -71,6 +73,7 @@ const createOrder = async (
         quantity: item.quantity,
         sellPrice: item.sellPrice,
         nameAndNumber: item.nameAndNumber || "",
+        productSize: item?.productSize,
       });
     }
 
@@ -162,7 +165,7 @@ const getAllOrders = async (query: Record<string, string>) => {
  */
 const getSingleOrder = async (id: string) => {
   const order = await Order.findById(id)
-    .populate("items", "nameAndNumber")
+    .populate("items", "nameAndNumber productSize")
     .populate("items.product", "name category basePrice discountPrice images")
     .populate("soldBy", "name email");
 

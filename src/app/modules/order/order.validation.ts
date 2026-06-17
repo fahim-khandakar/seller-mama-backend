@@ -10,6 +10,7 @@ const orderItemValidation = z.object({
   sellPrice: z.number().min(0, "Sell price must be positive"),
   purchasePrice: z.number().min(0).optional(),
   nameAndNumber: z.string().optional(),
+  productSize: z.string().optional(),
 });
 
 /**
